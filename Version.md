@@ -300,3 +300,10 @@ ont_awesome_flutter\ v11 APIs.
   - **WalletCarousel:** Built `lib/core/widgets/wallet_carousel.dart` leveraging Flutter's new native `CarouselView`. It handles horizontal scrolling of bank cards with dynamic scaling and edge-squishing for a truly expressive, liquid scrolling feel.
   - **TactileKeypad:** Built `lib/core/widgets/tactile_keypad.dart`, a custom numeric keypad for entering transaction amounts. Uses heavily rounded M3 geometries (`borderRadius: 24`), `InkWell` splash dynamics, and `HapticFeedback` integration to make data entry feel premium and responsive.
 - **Status:** 100% (Finance widgets successfully added and committed).
+
+## [2026-06-29 14:52] - Expressive Component Integration (Home Page)
+- **Action:** Surgically integrated the new M3 expressive components into the main Home Page flow.
+- **Features:**
+  - **Total Balance Shimmer:** Injected `AnimatedGradientText` into `total_balance_card.dart`, replacing the flat text with a slow-spinning gradient that draws attention to the total balance using the M3 seed colors.
+  - **Carousel Injection:** Integrated `WalletCarousel` directly into `home_page.dart` just below the balance hero, providing users with a liquid, squishable horizontal scroll area for their active cards/accounts.
+- **Status:** 100% (Integration complete and verified on Improv branch).

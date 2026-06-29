@@ -11,6 +11,7 @@ import '../../../core/database/providers.dart';
 import '../../../core/widgets/transaction_list_tile.dart';
 import '../../../core/services/currency_engine.dart';
 import '../../../core/theme/personalization_provider.dart';
+import '../../../core/widgets/wallet_carousel.dart';
 import '../widgets/animated_balance_hero.dart';
 import '../widgets/overview_card.dart';
 
@@ -137,6 +138,26 @@ class HomePage extends ConsumerWidget {
                   ),
 
                   const SliverToBoxAdapter(child: _HomeBalanceSection()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  SliverToBoxAdapter(
+                    child: WalletCarousel(
+                      cards: [
+                        const WalletCardTemplate(
+                          accountName: 'Main Checking',
+                          balance: '\$4,250.00',
+                          lastFourDigits: '4291',
+                          cardColor: Color(0xFF1E1E1E),
+                        ),
+                        WalletCardTemplate(
+                          accountName: 'Savings',
+                          balance: '\$12,000.00',
+                          lastFourDigits: '9920',
+                          cardColor: colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
                   const _SectionHeader(title: 'Overview'),
                   const _HomeFinanceGrid(),
                   const SliverToBoxAdapter(child: SizedBox(height: 32)),

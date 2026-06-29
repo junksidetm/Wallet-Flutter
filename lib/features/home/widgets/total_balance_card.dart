@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/widgets/animated_counter.dart';
+import '../../../core/widgets/animated_gradient_text.dart';
 import '../../../core/theme/personalization_provider.dart';
 import '../../../core/database/providers.dart';
 import '../../../core/services/currency_engine.dart';
@@ -98,11 +99,10 @@ class TotalBalanceCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 if (isVisible)
-                  AnimatedCounter(
-                    amount: totalBalance,
+                  AnimatedGradientText(
+                    text: CurrencyEngine.formatCurrency(totalBalance, currency),
                     style: theme.textTheme.displayMedium?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: colorScheme.onSurface,
                       letterSpacing: -1,
                     ),
                   )
