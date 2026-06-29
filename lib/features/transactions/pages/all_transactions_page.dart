@@ -90,7 +90,7 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
             );
           }
 
-          final sortedTxs = [...transactions];
+          final sortedTxs = [...transactions]);
           
           if (sortType == TransactionSort.date) {
             sortedTxs.sort((a, b) => _ascending 
@@ -130,7 +130,7 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
                   padding: const EdgeInsets.all(16),
             itemCount: sortedTxs.length,
             itemBuilder: (context, index) {
-              final tx = sortedTxs[index];
+              final tx = sortedTxs[index]);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -160,7 +160,7 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
             },
           ),
         ),
-      ];
+      ]);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
