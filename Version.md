@@ -279,3 +279,10 @@ ont_awesome_flutter\ v11 APIs.
   - **FluidMeshBackground:** Created a purely native animated mesh gradient background in `lib/core/widgets/fluid_mesh_background.dart` using `CustomPainter`, `MaskFilter.blur`, and Material 3 seed colors. Achieves fluid dynamics at 120 FPS without third-party dependencies.
   - **GlassCard:** Created a frosted glass container in `lib/core/widgets/glass_card.dart` using `BackdropFilter` and `surfaceContainerHighest` alpha transparency to pair perfectly over the fluid background.
 - **Status:** 100% (Core expressive elements built and ready for page integration).
+
+## [2026-06-29 14:45] - Additional Premium Expressive Elements
+- **Action:** Introduced two more advanced M3 expressive UI elements for text and navigation.
+- **Features:**
+  - **AnimatedGradientText:** Built `lib/core/widgets/animated_gradient_text.dart` which uses a `ShaderMask` and `GradientRotation` to pass a liquid, slow-spinning gradient derived from the M3 seed through text. Ideal for large total balances.
+  - **ExpressiveMorphingFab:** Built `lib/core/widgets/expressive_morphing_fab.dart`. An animated, morphing Floating Action Button that leverages `BackdropFilter` and `CurvedAnimation` to spin into an "X" while seamlessly blurring the background and revealing floating sub-actions.
+- **Status:** 100% (Components built natively and committed).
