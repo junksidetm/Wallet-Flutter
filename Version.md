@@ -307,3 +307,11 @@ ont_awesome_flutter\ v11 APIs.
   - **Total Balance Shimmer:** Injected `AnimatedGradientText` into `total_balance_card.dart`, replacing the flat text with a slow-spinning gradient that draws attention to the total balance using the M3 seed colors.
   - **Carousel Injection:** Integrated `WalletCarousel` directly into `home_page.dart` just below the balance hero, providing users with a liquid, squishable horizontal scroll area for their active cards/accounts.
 - **Status:** 100% (Integration complete and verified on Improv branch).
+
+## [2026-06-29 14:57] - Final Expressive UI Integration Pass
+- **Action:** Applied the remaining premium Material 3 components across the application.
+- **Features:**
+  - **Accounts Page (Carousel):** Moved the `WalletCarousel` to its rightful place on the Accounts page (`accounts_page.dart`), completely replacing the standard `PageView` with the squishable, physics-based `CarouselView`. Added scroll synchronization to keep the page indicators updated.
+  - **Add Transaction (Tactile Keypad):** Integrated the `TactileKeypad` into `add_transaction_page.dart`. Disabled the native system keyboard for the amount field to create a cohesive, haptic-enabled, fully immersive native amount entry experience.
+  - **All Transactions (Search Anchor):** Injected the `TransactionSearchAnchor` into the top of `all_transactions_page.dart`, instantly upgrading the list view with a floating, morphable M3 search bar.
+- **Status:** 100% (Integration complete on Improv branch).

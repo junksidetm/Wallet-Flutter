@@ -14,6 +14,7 @@ import '../widgets/account_card.dart';
 import '../widgets/category_segmented_bar.dart';
 import '../../../core/widgets/transaction_list_tile.dart';
 import '../../../core/widgets/icon_picker.dart';
+import '../../../core/widgets/wallet_carousel.dart';
 
 class AccountsPage extends ConsumerStatefulWidget {
   const AccountsPage({super.key});
@@ -73,17 +74,12 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                     const SizedBox(height: 16),
                     SizedBox(
                       height: 220,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: accounts.length,
+                      child: WalletCarousel(
                         onPageChanged: (index) => setState(() => _currentPage = index),
-                        itemBuilder: (context, index) {
-                          return AccountCard(
-                            account: accounts[index],
-                            onEdit: () => context.push('/add_account', extra: accounts[index]),
-
-                          );
-                        },
+                        cards: accounts.map((acc) => AccountCard(
+                          account: acc,
+                          onEdit: () => context.push('/add_account', extra: acc),
+                        )).toList(),
                       ),
                     ),
                     const SizedBox(height: 16),

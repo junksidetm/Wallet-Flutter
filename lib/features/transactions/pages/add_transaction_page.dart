@@ -18,6 +18,7 @@ import '../../../core/database/models/auxiliary_models.dart';
 import '../../../core/widgets/expressive_bottom_sheet.dart';
 import '../../../core/services/currency_engine.dart';
 import '../../people/widgets/person_avatar.dart';
+import '../../../core/widgets/tactile_keypad.dart';
 
 class AddTransactionPage extends ConsumerStatefulWidget {
   final TransactionModel? transaction;
@@ -140,6 +141,21 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
             const SizedBox(height: 32),
             _buildAmountInput(theme, effectiveColor),
             const SizedBox(height: 32),
+            TactileKeypad(
+              onKeyPressed: (val) {
+                if (_amountController.text == '0.00' || _amountController.text == '0') {
+                  _amountController.text = '';
+                }
+                _amountController.text += val;
+              },
+              onBackspace: () {
+                if (_amountController.text.isNotEmpty) {
+                  _amountController.text = _amountController.text.substring(0, _amountController.text.length - 1);
+                }
+              },
+              onSubmit: () => FocusScope.of(context).unfocus(),
+            ),
+            const SizedBox(height: 32),
             _buildNoteInput(),
             const SizedBox(height: 16),
             _buildDateTimePicker(colorScheme),
@@ -212,7 +228,10 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     final selectedCurrency = ref.watch(currencyProvider);
     return TextField(
       controller: _amountController,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      keyboardType: TextInputType.none,
+      readOnly: true,
+      showCursor: true,
+      autofocus: true,
       style: theme.textTheme.displayMedium?.copyWith(
         fontWeight: FontWeight.bold,
         color: effectiveColor,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/database/providers.dart';
 import '../../../core/database/models/transaction_model.dart';
 import '../../../core/widgets/transaction_list_tile.dart';
+import '../../../core/widgets/transaction_search_anchor.dart';
 
 class AllTransactionsPage extends ConsumerStatefulWidget {
   const AllTransactionsPage({super.key});
@@ -118,8 +119,15 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
             });
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
+          return Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: TransactionSearchAnchor(),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
             itemCount: sortedTxs.length,
             itemBuilder: (context, index) {
               final tx = sortedTxs[index];
@@ -150,7 +158,9 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
                 ),
               );
             },
-          );
+          ),
+        ),
+      ];
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
