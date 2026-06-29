@@ -293,3 +293,10 @@ ont_awesome_flutter\ v11 APIs.
   - **TransactionSearchAnchor:** Created `lib/core/widgets/transaction_search_anchor.dart` utilizing the modern M3 `SearchAnchor` and `SearchBar` APIs. Provides a fluid, morphing animation from a pill-shaped button to a full-screen search view.
   - **ExpressiveSegmentedControl:** Created `lib/core/widgets/expressive_segmented_control.dart` wrapping the M3 `SegmentedButton`. Highly customized using `secondaryContainer` dynamic colors to provide premium, tactile filtering between Income, Expense, and Transfer.
 - **Status:** 100% (M3 standard controls implemented natively).
+
+## [2026-06-29 14:50] - Finance-Specific Expressive UI Components
+- **Action:** Created premium finance-oriented UI components using advanced Flutter capabilities.
+- **Features:**
+  - **WalletCarousel:** Built `lib/core/widgets/wallet_carousel.dart` leveraging Flutter's new native `CarouselView`. It handles horizontal scrolling of bank cards with dynamic scaling and edge-squishing for a truly expressive, liquid scrolling feel.
+  - **TactileKeypad:** Built `lib/core/widgets/tactile_keypad.dart`, a custom numeric keypad for entering transaction amounts. Uses heavily rounded M3 geometries (`borderRadius: 24`), `InkWell` splash dynamics, and `HapticFeedback` integration to make data entry feel premium and responsive.
+- **Status:** 100% (Finance widgets successfully added and committed).
