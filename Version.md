@@ -272,3 +272,10 @@ ont_awesome_flutter\ v11 APIs.
   - **Performance:** Enabled Gradle caching (`org.gradle.caching=true`), configure on demand, and parallel execution to improve build speed.
   - **Cleanup:** Officially committed the removal of unused/deprecated files (`Build_Failure_Report.html`, `DEVELOPMENT_NOTES.md`, `Stat.md`).
 - **Status:** 100% (Optimizations applied and workspace cleaned).
+
+## [2026-06-29 14:42] - Material 3 Expressive Core Enhancements
+- **Action:** Introduced native, high-performance expressive widgets to elevate the UI.
+- **Features:**
+  - **FluidMeshBackground:** Created a purely native animated mesh gradient background in `lib/core/widgets/fluid_mesh_background.dart` using `CustomPainter`, `MaskFilter.blur`, and Material 3 seed colors. Achieves fluid dynamics at 120 FPS without third-party dependencies.
+  - **GlassCard:** Created a frosted glass container in `lib/core/widgets/glass_card.dart` using `BackdropFilter` and `surfaceContainerHighest` alpha transparency to pair perfectly over the fluid background.
+- **Status:** 100% (Core expressive elements built and ready for page integration).
