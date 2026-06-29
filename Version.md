@@ -286,3 +286,10 @@ ont_awesome_flutter\ v11 APIs.
   - **AnimatedGradientText:** Built `lib/core/widgets/animated_gradient_text.dart` which uses a `ShaderMask` and `GradientRotation` to pass a liquid, slow-spinning gradient derived from the M3 seed through text. Ideal for large total balances.
   - **ExpressiveMorphingFab:** Built `lib/core/widgets/expressive_morphing_fab.dart`. An animated, morphing Floating Action Button that leverages `BackdropFilter` and `CurvedAnimation` to spin into an "X" while seamlessly blurring the background and revealing floating sub-actions.
 - **Status:** 100% (Components built natively and committed).
+
+## [2026-06-29 14:49] - Material 3 Expressive Controls
+- **Action:** Introduced core Material 3 search and filtering components.
+- **Features:**
+  - **TransactionSearchAnchor:** Created `lib/core/widgets/transaction_search_anchor.dart` utilizing the modern M3 `SearchAnchor` and `SearchBar` APIs. Provides a fluid, morphing animation from a pill-shaped button to a full-screen search view.
+  - **ExpressiveSegmentedControl:** Created `lib/core/widgets/expressive_segmented_control.dart` wrapping the M3 `SegmentedButton`. Highly customized using `secondaryContainer` dynamic colors to provide premium, tactile filtering between Income, Expense, and Transfer.
+- **Status:** 100% (M3 standard controls implemented natively).
