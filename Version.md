@@ -381,3 +381,11 @@ ont_awesome_flutter\ v11 APIs.
       - Rendered centered `Testing APK Fail.svg` (`height="100"`) linking directly to the specific workflow run (`${{ github.repository }}/actions/runs/${{ github.run_id }}`).
       - Added `> [!WARNING]` alert and structured compiler error diagnostics with full build log tail details.
 - **Status:** 100% (Workflow updated, badges staged, ready for push).
+
+## [2026-09-27 12:00:00 IST] - Codeberg Migration & SSH Verified Commit Integration
+- **Action:** Initiated repository migration to Codeberg (`codeberg.org/mrdarksidetm/Wallet-Flutter`), established SSH ED25519 signed commit verification, and mapped Forgejo Actions CI/CD compatibility.
+- **Changes:**
+  - **Remote Architecture:** Configured `codeberg` git remote pointing to `git@codeberg.org:mrdarksidetm/Wallet-Flutter.git`.
+  - **Cryptographic Signing:** Standardized Git global author email (`ajukr99901@gmail.com`) and verified SSH commit signing using ED25519 key (`id_ed25519_signing`) for Forgejo Verified badge rendering.
+  - **CI/CD Architecture:** Verified Forgejo Actions compatibility with existing `.github/workflows/build_apks.yml` and `.github/workflows/codeql.yml` for automated multi-architecture APK compilation and CodeQL scanning.
+- **Status:** 100% (Migration prepared, remotes configured, cryptographic signing validated).
