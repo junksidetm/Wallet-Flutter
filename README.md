@@ -7,7 +7,7 @@
 [![Flutter Version](https://img.shields.io/badge/Flutter-3.5.0-blue.svg?logo=flutter)](https://flutter.dev)
 [![Material 3](https://img.shields.io/badge/Design-Material_3-green.svg)](https://m3.material.io)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-brightgreen.svg)](https://github.com/mrdarksidetm/Wallet-Flutter/graphs/commit-activity)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-brightgreen.svg)](https://github.com/junksidetm/Wallet-Flutter/graphs/commit-activity)
 
 **Project Wallet** is a premium, offline-first personal finance dashboard built with **Flutter 2026 Standards**. It empowers users to monitor their financial health, track transactions, manage multiple wallets, and visualize spending with high-performance, native aesthetics. ✨
 
@@ -30,14 +30,14 @@
 * Click the button below, to download the `Universal APk`. This apk can run on any device. You don't need to care about anything.
 <br><br>
 <p align="center">
-<a href="https://github.com/mrdarksidetm/Wallet-Flutter/releases/latest/download/wallet-universal.apk" target="_blank"><img src="assets/images/Direct%20Link%20Frame%20Badge.svg" height="100" alt="Direct Downloader Badge"></a></p>
+<a href="https://github.com/junksidetm/Wallet-Flutter/releases/latest/download/wallet-universal.apk" target="_blank"><img src="assets/images/Direct%20Link%20Frame%20Badge.svg" height="100" alt="Direct Downloader Badge"></a></p>
 
 <BR><BR>
 
 * If you use 3rd Party Providers, like [Obtanium](https://obtainium.imranr.dev/) or some other service to download or track from Github Releases. Use the links below.
 <p align="center">
-<a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22com.mrdarksidetm.wallet%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fmrdarksidetm%2FWallet-Flutter%22%2C%22author%22%3A%22mrdarksidetm%22%2C%22name%22%3A%22Wallet%20Flutter%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Afalse%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionDetection%5C%22%3A%5C%22standardVersionDetection%5C%22%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22%5C%22%7D%22%7D" target="_blank"><img src="assets/images/obtanium-badge.png" height="100" alt="Obtanium Badge"></a>
-<a href="https://github.com/mrdarksidetm/Wallet-Flutter/releases/latest" target="_blank"><img src="assets/images/github-badge.png" height="100" alt="Github Badge"></a>
+<a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22com.mrdarksidetm.wallet%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fjunksidetm%2FWallet-Flutter%22%2C%22author%22%3A%22mrdarksidetm%22%2C%22name%22%3A%22Wallet%20Flutter%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Afalse%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Afalse%2C%5C%22dontSortReleasesList%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionDetection%5C%22%3A%5C%22standardVersionDetection%5C%22%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22%5C%22%7D%22%7D" target="_blank"><img src="assets/images/obtanium-badge.png" height="100" alt="Obtanium Badge"></a>
+<a href="https://github.com/junksidetm/Wallet-Flutter/releases/latest" target="_blank"><img src="assets/images/github-badge.png" height="100" alt="Github Badge"></a>
 </p>
 
 ---
@@ -66,7 +66,7 @@
 1. **Clone the repository**:
 
     ```bash
-    git clone --recursive https://github.com/mrdarksidetm/Wallet-Flutter.git
+    git clone --recursive https://github.com/junksidetm/Wallet-Flutter.git
     cd Wallet-Flutter
     ```
 
@@ -119,9 +119,9 @@ Distributed under the MIT License. See `LICENSE` for more information. ⚖️
 
 ## 📧 Contact
 
-**Abhijeet Yadav** - [@mrdarksidetm](https://github.com/mrdarksidetm) 👨‍💻
+**Abhijeet Yadav** - [@junksidetm](https://github.com/junksidetm) 👨‍💻
 
-Project Link: [https://github.com/mrdarksidetm/Wallet-Flutter](https://github.com/mrdarksidetm/Wallet-Flutter) 🔗
+Project Link: [https://github.com/junksidetm/Wallet-Flutter](https://github.com/junksidetm/Wallet-Flutter) 🔗
 
 ---
 *Built with ❤️ for the Flutter Community.*
