@@ -14,6 +14,12 @@
 
 **Project Wallet** is a premium, offline-first personal finance dashboard built with **Flutter 2026 Standards**. It empowers users to monitor their financial health, track transactions, manage multiple wallets, and visualize spending with high-performance, native aesthetics. ✨
 
+<div align="center">
+  <a href="https://github.com/junksidetm/Wallet-Flutter/releases/latest/download/wallet-arm64-v8a.apk" target="_blank" rel="noopener noreferrer">
+    <img src="https://raw.githubusercontent.com/junksidetm/assests/d8774837b8c8658389ea37193a77a9a100414bc5/Images/badges/SVG%20-%20Version/Android%20Direct%20Link%20Frame.svg" alt="Direct Link" width="290">
+  </a>
+</div>
+
 ---
 
 ## 🚀 Key Features

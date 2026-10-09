@@ -411,3 +411,26 @@ ont_awesome_flutter\ v11 APIs.
   - `README.md`
   - `Version.md`
 - **Status**: 100% (Completed & Synced)
+
+## [2026-10-09 22:05:00 IST] - Production GitHub Release Pipeline & Direct Download Badge Resolution
+- **Action**: Enabled automated GitHub Releases publishing in CI workflow for production APKs and wired direct APK download badge in README.md.
+- **Components Modified**:
+  - `.github/workflows/build_apks.yml`: Added repository write permissions, checksum generation, and automated GitHub Releases job publishing all architecture-specific and universal APKs.
+  - `README.md`: Connected Direct Link Frame badge href to direct GitHub release asset endpoint.
+  - `Version.md`: Appended tracking entry.
+- **Status**: 100% (Completed)
+
+## [2026-10-09 22:15:00 IST] - Hub Ecosystem URL Migration
+- **Action**: Migrated ecosystem and Forge Hub navigation links from `mrdarksidetm.github.io` to `junksidetm.github.io`.
+- **Files Modified**:
+  - `docs/index.html`: Updated Ecosystem navbar link and Forge Hub footer link.
+  - `Version.md`: Appended ledger entry.
+- **Status**: 100% (Completed)
+
+## [2026-10-09 23:12:00 IST] - Automated GitHub Pages Deployment Pipeline
+- **Action**: Established automated GitHub Pages deployment workflow deploying `docs/` showcase on `main` branch push.
+- **Files Added**:
+  - `.github/workflows/pages.yml`
+- **Files Modified**:
+  - `Version.md`: Appended tracking entry.
+- **Status**: 100% (Completed)

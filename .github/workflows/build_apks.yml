@@ -7,6 +7,9 @@ on:
     branches: [ main, develop, Improv, 'Improv-Sandbox', 'sandbox/**', 'sandbox/*', '*sandbox*', '*Sandbox*' ]
   workflow_dispatch: # Allows manual trigger
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build & Release APKs
@@ -340,6 +343,44 @@ jobs:
           path: "*.log"
           if-no-files-found: ignore
           retention-days: 2
+
+      - name: Generate Checksums
+        if: success()
+        run: |
+          cd build/app/outputs/final-apks
+          for apk in *.apk; do
+            if [ -f "$apk" ]; then
+              sha256sum "$apk" > "$apk.sha256"
+            fi
+          done
+          ls -lah
+
+      - name: Create GitHub Release (On Main Branch)
+        if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-b${{ github.run_number }}
+          name: "Wallet v1.0.0 (Build #${{ github.run_number }})"
+          make_latest: true
+          body: |
+            ## 📱 Project Wallet Flutter v1.0.0 (Build #${{ github.run_number }})
+
+            <p align="center">
+              <a href="https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm64-v8a.apk">
+                <img src="https://raw.githubusercontent.com/junksidetm/assests/d8774837b8c8658389ea37193a77a9a100414bc5/Images/badges/SVG%20-%20Version/Android%20Direct%20Link%20Frame.svg" alt="Direct APK Download" width="290" />
+              </a>
+            </p>
+
+            ### 🚀 Direct Standalone Downloads
+            - 📱 **Direct ARM64 APK (Recommended)**: [**wallet-arm64-v8a.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm64-v8a.apk) *(Pure `.apk` for 64-bit devices)*
+            - 🌐 **Direct Universal APK**: [**wallet-universal.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-universal.apk) *(All architectures bundled)*
+            - 📲 **Direct ARMv7 APK**: [**wallet-arm-v7a.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm-v7a.apk)
+            - 💻 **Direct x86_64 APK**: [**wallet-x86_64.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-x86_64.apk)
+          files: |
+            build/app/outputs/final-apks/*.apk
+            build/app/outputs/final-apks/*.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish Success to Job Summary
         if: success()
