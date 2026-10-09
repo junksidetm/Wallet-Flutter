@@ -386,7 +386,7 @@ ont_awesome_flutter\ v11 APIs.
 - **Action:** Initiated repository migration to Codeberg (`codeberg.org/mrdarksidetm/Wallet-Flutter`), established SSH ED25519 signed commit verification, and mapped Forgejo Actions CI/CD compatibility.
 - **Changes:**
   - **Remote Architecture:** Configured `codeberg` git remote pointing to `git@codeberg.org:mrdarksidetm/Wallet-Flutter.git`.
-  - **Cryptographic Signing:** Standardized Git global author email (`ajukr99901@gmail.com`) and verified SSH commit signing using ED25519 key (`id_ed25519_signing`) for Forgejo Verified badge rendering.
+  - **Cryptographic Signing:** Configured verified SSH commit signing using ED25519 key (`id_ed25519_signing`) for Forgejo Verified badge rendering.
   - **CI/CD Architecture:** Verified Forgejo Actions compatibility with existing `.github/workflows/build_apks.yml` and `.github/workflows/codeql.yml` for automated multi-architecture APK compilation and CodeQL scanning.
 - **Status:** 100% (Migration prepared, remotes configured, cryptographic signing validated).
 
@@ -394,7 +394,7 @@ ont_awesome_flutter\ v11 APIs.
 - **Action**: Created new GitHub repository under `junksidetm/Wallet-Flutter` and configured simultaneous multi-push synchronization across GitHub, GitLab, and Codeberg.
 - **Changes**:
   - **Remote Architecture:** Configured `origin` remote to push concurrently to GitHub (`https://github.com/junksidetm/Wallet-Flutter.git`), GitLab (`git@gitlab.com:mrdarksidetm/Wallet-Flutter.git`), and Codeberg (`git@codeberg.org:mrdarksidetm/Wallet-Flutter.git`).
-  - **Credential & Identity Mapping:** Automated conditional Git identity (`.gitconfig-github`) utilizing `junksidetm <331540275+junksidetm@users.noreply.github.com>` for GitHub while maintaining `mrdarksidetm <ajukr99901@gmail.com>` for GitLab and Codeberg.
+  - **Credential & Identity Mapping:** Automated conditional Git identity (`.gitconfig-github`) utilizing `junksidetm` for GitHub while maintaining `mrdarksidetm` for GitLab and Codeberg.
   - **Branch Synchronization:** Pushed `main` and `Improv` branches and all tags to `junksidetm/Wallet-Flutter`.
 - **Status:** 100% (GitHub repository created, multi-push remote active, and branches synchronized across all 3 platforms).
 
