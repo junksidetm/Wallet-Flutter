@@ -265,6 +265,56 @@ ont_awesome_flutter\ v11 APIs.
   - **Architecture:** Cleaned up redundant onboarding logic and synchronized state providers.
 - **Status:** 100% (Changes verified and ready for production release).
 
+## [2026-06-29 14:33] - Performance Optimizations & Cleanup
+- **Action:** Optimized Gradle memory usage for 4GB constraints and removed deprecated files.
+- **Changes:**
+  - **Gradle Fix:** Reduced JVM heap size to `-Xmx2G` and Metaspace to `-XX:MaxMetaspaceSize=1G` in `gradle.properties`.
+  - **Performance:** Enabled Gradle caching (`org.gradle.caching=true`), configure on demand, and parallel execution to improve build speed.
+  - **Cleanup:** Officially committed the removal of unused/deprecated files (`Build_Failure_Report.html`, `DEVELOPMENT_NOTES.md`, `Stat.md`).
+- **Status:** 100% (Optimizations applied and workspace cleaned).
+
+## [2026-06-29 14:42] - Material 3 Expressive Core Enhancements
+- **Action:** Introduced native, high-performance expressive widgets to elevate the UI.
+- **Features:**
+  - **FluidMeshBackground:** Created a purely native animated mesh gradient background in `lib/core/widgets/fluid_mesh_background.dart` using `CustomPainter`, `MaskFilter.blur`, and Material 3 seed colors. Achieves fluid dynamics at 120 FPS without third-party dependencies.
+  - **GlassCard:** Created a frosted glass container in `lib/core/widgets/glass_card.dart` using `BackdropFilter` and `surfaceContainerHighest` alpha transparency to pair perfectly over the fluid background.
+- **Status:** 100% (Core expressive elements built and ready for page integration).
+
+## [2026-06-29 14:45] - Additional Premium Expressive Elements
+- **Action:** Introduced two more advanced M3 expressive UI elements for text and navigation.
+- **Features:**
+  - **AnimatedGradientText:** Built `lib/core/widgets/animated_gradient_text.dart` which uses a `ShaderMask` and `GradientRotation` to pass a liquid, slow-spinning gradient derived from the M3 seed through text. Ideal for large total balances.
+  - **ExpressiveMorphingFab:** Built `lib/core/widgets/expressive_morphing_fab.dart`. An animated, morphing Floating Action Button that leverages `BackdropFilter` and `CurvedAnimation` to spin into an "X" while seamlessly blurring the background and revealing floating sub-actions.
+- **Status:** 100% (Components built natively and committed).
+
+## [2026-06-29 14:49] - Material 3 Expressive Controls
+- **Action:** Introduced core Material 3 search and filtering components.
+- **Features:**
+  - **TransactionSearchAnchor:** Created `lib/core/widgets/transaction_search_anchor.dart` utilizing the modern M3 `SearchAnchor` and `SearchBar` APIs. Provides a fluid, morphing animation from a pill-shaped button to a full-screen search view.
+  - **ExpressiveSegmentedControl:** Created `lib/core/widgets/expressive_segmented_control.dart` wrapping the M3 `SegmentedButton`. Highly customized using `secondaryContainer` dynamic colors to provide premium, tactile filtering between Income, Expense, and Transfer.
+- **Status:** 100% (M3 standard controls implemented natively).
+
+## [2026-06-29 14:50] - Finance-Specific Expressive UI Components
+- **Action:** Created premium finance-oriented UI components using advanced Flutter capabilities.
+- **Features:**
+  - **WalletCarousel:** Built `lib/core/widgets/wallet_carousel.dart` leveraging Flutter's new native `CarouselView`. It handles horizontal scrolling of bank cards with dynamic scaling and edge-squishing for a truly expressive, liquid scrolling feel.
+  - **TactileKeypad:** Built `lib/core/widgets/tactile_keypad.dart`, a custom numeric keypad for entering transaction amounts. Uses heavily rounded M3 geometries (`borderRadius: 24`), `InkWell` splash dynamics, and `HapticFeedback` integration to make data entry feel premium and responsive.
+- **Status:** 100% (Finance widgets successfully added and committed).
+
+## [2026-06-29 14:52] - Expressive Component Integration (Home Page)
+- **Action:** Surgically integrated the new M3 expressive components into the main Home Page flow.
+- **Features:**
+  - **Total Balance Shimmer:** Injected `AnimatedGradientText` into `total_balance_card.dart`, replacing the flat text with a slow-spinning gradient that draws attention to the total balance using the M3 seed colors.
+  - **Carousel Injection:** Integrated `WalletCarousel` directly into `home_page.dart` just below the balance hero, providing users with a liquid, squishable horizontal scroll area for their active cards/accounts.
+- **Status:** 100% (Integration complete and verified on Improv branch).
+
+## [2026-06-29 14:57] - Final Expressive UI Integration Pass
+- **Action:** Applied the remaining premium Material 3 components across the application.
+- **Features:**
+  - **Accounts Page (Carousel):** Moved the `WalletCarousel` to its rightful place on the Accounts page (`accounts_page.dart`), completely replacing the standard `PageView` with the squishable, physics-based `CarouselView`. Added scroll synchronization to keep the page indicators updated.
+  - **Add Transaction (Tactile Keypad):** Integrated the `TactileKeypad` into `add_transaction_page.dart`. Disabled the native system keyboard for the amount field to create a cohesive, haptic-enabled, fully immersive native amount entry experience.
+  - **All Transactions (Search Anchor):** Injected the `TransactionSearchAnchor` into the top of `all_transactions_page.dart`, instantly upgrading the list view with a floating, morphable M3 search bar.
+- **Status:** 100% (Integration complete on Improv branch).
 ## [2026-08-24 10:15] - The Expressive Architecture Update (v4.0.5)
 - **Action:** Upgraded project to version 4.0.5 with full Material 3 Expressive redesign, settings revamp, and toolchain stabilization.
 - **Changes:**
@@ -441,3 +491,17 @@ ont_awesome_flutter\ v11 APIs.
   - `README.md`
   - `Version.md`
 - **Status**: 100% (Completed & Synced)
+
+## [2026-10-14 10:45:00 IST] - v5.1.2: Branch/Tag Cleanup, junksidetm Links, Robustness & Size Fixes
+- **Action**: Merged `main` and `sandbox/Improv` into `Improv`, cleaned up branches and tags on all three hosts, repointed links to `github.com/junksidetm/Wallet-Flutter`, fixed release tagging, applied robustness/size/accessibility fixes, bumped the version to 5.1.2 and wrote the improvement roadmap.
+- **Changes**:
+  - **Branches**: Deleted `sandbox/Improv`, `Improv-Sandbox`, two Dependabot branches and the `Improv-sandbox` worktree. Only `main` and `Improv` remain.
+  - **Tags/Releases**: Removed `v.4.5.5`, `v1.4.1` and `v1.0.0-b12` (and its release); renamed `v1.0.0-b14` to `v4.5.5` ("Wallet v4.5.5"). GitHub, GitLab and Codeberg now carry the same tags.
+  - **CI**: Releases are tagged `v<pubspec version>`, run once per version, and take their notes from `release-notes/v<version>.md`. Sandbox triggers removed.
+  - **Links**: About page, in-app updater and landing page point to `junksidetm`.
+  - **Robustness**: Recurring check runs once per launch; Isar inspector is debug-only; updater version compare tolerates suffixes; placeholder Home carousel removed; carousel cards accept taps; Accounts page indicator follows the carousel.
+  - **Size/A11y**: Dropped 7 unused icon font declarations (~35 MB); added tooltips to 25 icon buttons.
+  - **Version**: `5.1.2+50102` in `pubspec.yaml`, `about_page.dart`, `settings_page.dart`.
+- **Files Modified**: `.github/workflows/build_apks.yml`, `pubspec.yaml`, `docs/index.html`, `lib/main.dart`, `lib/core/database/isar_service.dart`, `lib/core/services/update_service.dart`, `lib/core/widgets/wallet_carousel.dart`, `lib/features/accounts/pages/accounts_page.dart`, `lib/features/home/pages/home_page.dart`, `lib/features/settings/pages/about_page.dart`, `lib/features/settings/pages/settings_page.dart`, 21 files for tooltips, `Version.md`
+- **Files Added**: `IMPROVEMENT_PLAN.md`, `release-notes/v5.1.2.md`
+- **Status**: 100% (Committed on Improv; release pending CI and merge to main)

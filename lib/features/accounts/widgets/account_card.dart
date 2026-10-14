@@ -150,6 +150,7 @@ class _AccountCardState extends ConsumerState<AccountCard> with SingleTickerProv
                         ),
                         if (widget.onEdit != null)
                           IconButton(
+                            tooltip: 'Edit account',
                             onPressed: widget.onEdit,
                             icon: Icon(Symbols.edit, color: colorScheme.onSurface.withValues(alpha: 0.5), size: 20),
                           ),

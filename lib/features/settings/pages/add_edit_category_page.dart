@@ -89,6 +89,7 @@ class _AddEditCategoryPageState extends ConsumerState<AddEditCategoryPage> {
         actions: [
           if (widget.category != null)
             IconButton(
+              tooltip: 'Delete category',
               onPressed: _showDeleteDialog,
               icon: Icon(Symbols.delete_rounded, color: colorScheme.error),
             ),

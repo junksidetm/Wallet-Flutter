@@ -15,6 +15,7 @@ import '../widgets/account_card.dart';
 import '../widgets/category_segmented_bar.dart';
 import '../../../core/widgets/transaction_segmented_group.dart';
 import '../../../core/widgets/icon_picker.dart';
+import '../../../core/widgets/wallet_carousel.dart';
 
 class AccountsPage extends ConsumerStatefulWidget {
   const AccountsPage({super.key});
@@ -24,14 +25,7 @@ class AccountsPage extends ConsumerStatefulWidget {
 }
 
 class _AccountsPageState extends ConsumerState<AccountsPage> {
-  final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentPage = 0;
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +78,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                 ),
                 actions: [
                   IconButton(
+                    tooltip: 'Reorder accounts',
                     icon: const Icon(Symbols.reorder),
                     onPressed: () {
                       final accs = accountsAsync.value?.toList() ?? <Account>[];
@@ -100,22 +95,17 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                     const SizedBox(height: 16),
                     SizedBox(
                       height: 220,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: accounts.length,
+                      child: WalletCarousel(
                         onPageChanged: (index) => setState(() => _currentPage = index),
-                        itemBuilder: (context, index) {
-                          return AccountCard(
-                            account: accounts[index],
-                            onEdit: () => context.push('/add_account', extra: accounts[index]),
-
-                          );
-                        },
+                        cards: accounts.map((acc) => AccountCard(
+                          account: acc,
+                          onEdit: () => context.push('/add_account', extra: acc),
+                        )).toList(),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    SmoothPageIndicator(
-                      controller: _pageController,
+                    AnimatedSmoothIndicator(
+                      activeIndex: pageIndex,
                       count: accounts.length,
                       effect: ExpandingDotsEffect(
                         dotHeight: 8,

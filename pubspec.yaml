@@ -2,7 +2,7 @@ name: wallet
 description: A new Flutter project.
 publish_to: 'none'
 
-version: 4.5.5+1
+version: 5.1.2+50102
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -112,27 +112,9 @@ flutter:
       fonts:
         - asset: assets/fonts/Emoji/iOS15.4_Fixed_space.ttf
 
-    - family: MaterialSymbolsOutlined
-      fonts:
-        - asset: assets/fonts/Icons/MaterialSymbolsOutlined.ttf
-    - family: MaterialSymbolsRounded
-      fonts:
-        - asset: assets/fonts/Icons/MaterialSymbolsRounded.ttf
-    - family: MaterialSymbolsSharp
-      fonts:
-        - asset: assets/fonts/Icons/MaterialSymbolsSharp.ttf
-    - family: MaterialDesignIcons
-      fonts:
-        - asset: assets/fonts/Icons/materialdesignicons-webfont.ttf
-    - family: FontAwesomeBrands
-      fonts:
-        - asset: assets/fonts/Icons/Font-Awesome-7-Brands-Regular-400.otf
-    - family: FontAwesomeRegular
-      fonts:
-        - asset: assets/fonts/Icons/Font-Awesome-7-Free-Regular-400.otf
-    - family: FontAwesomeSolid
-      fonts:
-        - asset: assets/fonts/Icons/Font-Awesome-7-Free-Solid-900.otf
+    # Icon fonts come from material_symbols_icons, flutter_material_design_icons
+    # and font_awesome_flutter (bundled under packages/...). The duplicate
+    # families that used to be declared here (~35 MB) were never referenced.
 
 flutter_launcher_icons:
   android: true

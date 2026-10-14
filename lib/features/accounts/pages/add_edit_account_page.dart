@@ -109,6 +109,7 @@ class _AddEditAccountPageState extends ConsumerState<AddEditAccountPage> {
         actions: [
           if (widget.account != null)
             IconButton(
+              tooltip: 'Delete account',
               onPressed: _showDeleteDialog,
               icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
             ),

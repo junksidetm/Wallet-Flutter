@@ -97,7 +97,7 @@ class AppUpdate {
 
 class UpdateService {
   final String repoUrl =
-      'https://api.github.com/repos/mrdarksidetm/Wallet-Flutter/releases/latest';
+      'https://api.github.com/repos/junksidetm/Wallet-Flutter/releases/latest';
   final Dio _dio = Dio();
   static const _platform = MethodChannel('com.mrdarksidetm.wallet/app_info');
 
@@ -147,8 +147,15 @@ class UpdateService {
 
   bool isNewerVersion(String currentVersion, String latestVersion) {
     try {
-      final current = currentVersion.split('.').map(int.parse).toList();
-      final latest = latestVersion.split('.').map(int.parse).toList();
+      // Compare only the numeric core: "5.1.2+3" / "5.1.2-b14" -> [5, 1, 2].
+      List<int> core(String v) => v
+          .split(RegExp(r'[+-]'))
+          .first
+          .split('.')
+          .map((p) => int.tryParse(p) ?? 0)
+          .toList();
+      final current = core(currentVersion);
+      final latest = core(latestVersion);
 
       for (var i = 0; i < latest.length; i++) {
         if (i >= current.length) return true;

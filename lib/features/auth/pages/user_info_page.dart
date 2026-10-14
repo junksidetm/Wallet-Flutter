@@ -179,6 +179,7 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
                   hintText: 'Enter your name',
                   prefixIcon: const Icon(Symbols.edit, size: 20),
                   suffixIcon: IconButton(
+                    tooltip: 'Clear name',
                     onPressed: () => _nameController.clear(),
                     icon: const Icon(Symbols.close, size: 20),
                   ),

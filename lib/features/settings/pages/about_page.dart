@@ -19,7 +19,7 @@ class AboutPage extends ConsumerStatefulWidget {
 }
 
 class _AboutPageState extends ConsumerState<AboutPage> {
-  String _currentVersion = '4.5.5';
+  String _currentVersion = '5.1.2';
 
   int _versionTapCount = 0;
   DateTime? _lastTapTime;
@@ -193,7 +193,7 @@ class _AboutPageState extends ConsumerState<AboutPage> {
                     title: 'Abhijeet Yadav',
                     subtitle: 'Developer',
                     showDivider: false,
-                    onTap: () => _launchUrl('https://github.com/mrdarksidetm'),
+                    onTap: () => _launchUrl('https://github.com/junksidetm'),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -208,7 +208,7 @@ class _AboutPageState extends ConsumerState<AboutPage> {
                             ),
                             label: 'Github',
                             onTap: () =>
-                                _launchUrl('https://github.com/mrdarksidetm'),
+                                _launchUrl('https://github.com/junksidetm'),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -247,7 +247,7 @@ class _AboutPageState extends ConsumerState<AboutPage> {
                     subtitle: 'View source code repository on GitHub',
                     showDivider: true,
                     onTap: () =>
-                        _launchUrl('https://github.com/mrdarksidetm/wallet-flutter'),
+                        _launchUrl('https://github.com/junksidetm/Wallet-Flutter'),
                   ),
                   SettingsActionTile(
                     icon: Symbols.shield_lock_rounded,

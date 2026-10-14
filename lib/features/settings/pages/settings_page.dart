@@ -16,7 +16,7 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
-  String _currentVersion = '4.5.5';
+  String _currentVersion = '5.1.2';
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -275,6 +275,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
+                        tooltip: 'Clear search',
                         icon: const Icon(Symbols.close_rounded, size: 20),
                         onPressed: () {
                           _searchController.clear();

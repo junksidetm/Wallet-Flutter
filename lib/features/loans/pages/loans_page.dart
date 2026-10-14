@@ -216,6 +216,7 @@ class _LoansPageState extends ConsumerState<LoansPage> {
               ],
             ),
             IconButton.filledTonal(
+              tooltip: 'Toggle section',
               onPressed: onToggleSection,
               icon: AnimatedRotation(
                 turns: isSectionExpanded ? 0.0 : 0.5,

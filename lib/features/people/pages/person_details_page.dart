@@ -235,6 +235,7 @@ class _PersonDetailsPageState extends ConsumerState<PersonDetailsPage> {
             ),
             actions: [
               IconButton(
+                tooltip: 'Edit person',
                 icon: const Icon(Symbols.edit),
                 onPressed: _editPerson,
               ),
