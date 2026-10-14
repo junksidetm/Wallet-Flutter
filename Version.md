@@ -491,3 +491,17 @@ ont_awesome_flutter\ v11 APIs.
   - `README.md`
   - `Version.md`
 - **Status**: 100% (Completed & Synced)
+
+## [2026-10-14 10:45:00 IST] - v5.1.2: Branch/Tag Cleanup, junksidetm Links, Robustness & Size Fixes
+- **Action**: Merged `main` and `sandbox/Improv` into `Improv`, cleaned up branches and tags on all three hosts, repointed links to `github.com/junksidetm/Wallet-Flutter`, fixed release tagging, applied robustness/size/accessibility fixes, bumped the version to 5.1.2 and wrote the improvement roadmap.
+- **Changes**:
+  - **Branches**: Deleted `sandbox/Improv`, `Improv-Sandbox`, two Dependabot branches and the `Improv-sandbox` worktree. Only `main` and `Improv` remain.
+  - **Tags/Releases**: Removed `v.4.5.5`, `v1.4.1` and `v1.0.0-b12` (and its release); renamed `v1.0.0-b14` to `v4.5.5` ("Wallet v4.5.5"). GitHub, GitLab and Codeberg now carry the same tags.
+  - **CI**: Releases are tagged `v<pubspec version>`, run once per version, and take their notes from `release-notes/v<version>.md`. Sandbox triggers removed.
+  - **Links**: About page, in-app updater and landing page point to `junksidetm`.
+  - **Robustness**: Recurring check runs once per launch; Isar inspector is debug-only; updater version compare tolerates suffixes; placeholder Home carousel removed; carousel cards accept taps; Accounts page indicator follows the carousel.
+  - **Size/A11y**: Dropped 7 unused icon font declarations (~35 MB); added tooltips to 25 icon buttons.
+  - **Version**: `5.1.2+50102` in `pubspec.yaml`, `about_page.dart`, `settings_page.dart`.
+- **Files Modified**: `.github/workflows/build_apks.yml`, `pubspec.yaml`, `docs/index.html`, `lib/main.dart`, `lib/core/database/isar_service.dart`, `lib/core/services/update_service.dart`, `lib/core/widgets/wallet_carousel.dart`, `lib/features/accounts/pages/accounts_page.dart`, `lib/features/home/pages/home_page.dart`, `lib/features/settings/pages/about_page.dart`, `lib/features/settings/pages/settings_page.dart`, 21 files for tooltips, `Version.md`
+- **Files Added**: `IMPROVEMENT_PLAN.md`, `release-notes/v5.1.2.md`
+- **Status**: 100% (Committed on Improv; release pending CI and merge to main)
