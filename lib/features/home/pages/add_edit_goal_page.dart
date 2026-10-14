@@ -121,6 +121,7 @@ class _AddEditGoalPageState extends ConsumerState<AddEditGoalPage> {
         actions: [
           if (widget.goal != null)
             IconButton(
+              tooltip: 'Delete goal',
               onPressed: _showDeleteDialog,
               icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
             ),

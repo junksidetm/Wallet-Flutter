@@ -78,6 +78,7 @@ class _AccountsPageState extends ConsumerState<AccountsPage> {
                 ),
                 actions: [
                   IconButton(
+                    tooltip: 'Reorder accounts',
                     icon: const Icon(Symbols.reorder),
                     onPressed: () {
                       final accs = accountsAsync.value?.toList() ?? <Account>[];

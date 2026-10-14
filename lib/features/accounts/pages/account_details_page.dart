@@ -44,6 +44,7 @@ class AccountDetailsPage extends ConsumerWidget {
             ),
             actions: [
               IconButton(
+                tooltip: 'Edit account',
                 onPressed: () => context.push('/add_account', extra: currentAccount),
                 icon: const Icon(Symbols.edit),
               ),

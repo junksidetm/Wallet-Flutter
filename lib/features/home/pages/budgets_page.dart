@@ -154,6 +154,7 @@ class _BudgetCard extends ConsumerWidget {
                         limit: limit,
                         currencyFormat: currencyFormat)),
                 IconButton(
+                  tooltip: 'Set budget',
                   icon: Icon(hasBudget ? Symbols.edit : Symbols.add_circle,
                       color: colorScheme.primary),
                   onPressed: () => _showSetBudgetDialog(

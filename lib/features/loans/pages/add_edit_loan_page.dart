@@ -201,6 +201,7 @@ class _AddEditLoanPageState extends ConsumerState<AddEditLoanPage> {
               title: const Text('Due Date'),
               subtitle: Text(_dueDate != null ? DateFormat('MMM d, yyyy').format(_dueDate!) : 'None'),
               trailing: _dueDate != null ? IconButton(
+                tooltip: 'Clear due date',
                 icon: const Icon(Icons.close, size: 16),
                 onPressed: () => setState(() => _dueDate = null),
               ) : null,

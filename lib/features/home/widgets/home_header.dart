@@ -48,6 +48,7 @@ class HomeHeader extends StatelessWidget {
             children: [
               // Settings Icon
               IconButton(
+                tooltip: 'Settings',
                 icon: const Icon(Symbols.settings),
                 onPressed: () {
                   context.push('/settings');

@@ -49,6 +49,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             prefixIcon: const Icon(Symbols.search),
             suffixIcon: _query.isNotEmpty
                 ? IconButton(
+                    tooltip: 'Clear search',
                     icon: const Icon(Symbols.close),
                     onPressed: () {
                       _searchController.clear();

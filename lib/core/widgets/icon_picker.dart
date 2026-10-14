@@ -495,6 +495,7 @@ class _IconPickerWidgetState extends ConsumerState<IconPickerWidget> {
               prefixIcon: Icon(Symbols.search, color: colorScheme.primary),
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
+                      tooltip: 'Clear search',
                       icon: const Icon(Symbols.close),
                       onPressed: () {
                         _searchController.clear();

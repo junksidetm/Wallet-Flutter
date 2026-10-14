@@ -103,6 +103,7 @@ class TotalBalanceCard extends ConsumerWidget {
                       ),
                     ),
                     IconButton(
+                      tooltip: 'Toggle balance visibility',
                       onPressed: () {
                         ref.read(personalizationProvider.notifier).toggleBalanceVisibility();
                       },

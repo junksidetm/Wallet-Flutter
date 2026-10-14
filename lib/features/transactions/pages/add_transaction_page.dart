@@ -160,6 +160,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
       actions: [
         if (widget.transaction != null)
           IconButton(
+            tooltip: 'Delete transaction',
             onPressed: _delete,
             icon: Icon(Symbols.delete_rounded, color: colorScheme.error),
           ),

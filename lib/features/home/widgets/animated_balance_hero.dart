@@ -154,6 +154,7 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                           ),
                           const SizedBox(width: 4),
                           IconButton(
+                            tooltip: 'Balance info',
                             onPressed: () {
                               showDialog(
                                 context: context,
@@ -182,6 +183,7 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                         ],
                       ),
                       IconButton(
+                        tooltip: 'Toggle balance visibility',
                         onPressed: () => ref.read(personalizationProvider.notifier).toggleBalanceVisibility(),
                         icon: Icon(
                           isVisible ? Symbols.visibility : Symbols.visibility_off,

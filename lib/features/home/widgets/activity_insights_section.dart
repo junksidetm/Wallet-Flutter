@@ -144,6 +144,7 @@ class _ActivityInsightsSectionState extends ConsumerState<ActivityInsightsSectio
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
+                tooltip: 'Previous',
                 icon: const Icon(Symbols.chevron_left_rounded, size: 20),
                 visualDensity: VisualDensity.compact,
                 onPressed: () {
@@ -161,6 +162,7 @@ class _ActivityInsightsSectionState extends ConsumerState<ActivityInsightsSectio
                 ),
               ),
               IconButton(
+                tooltip: 'Next',
                 icon: const Icon(Symbols.chevron_right_rounded, size: 20),
                 visualDensity: VisualDensity.compact,
                 onPressed: () {

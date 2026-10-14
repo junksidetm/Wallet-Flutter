@@ -90,6 +90,7 @@ class HomePage extends ConsumerWidget {
                     ),
                     actions: [
                       IconButton(
+                        tooltip: 'Settings',
                         icon: const Icon(Symbols.settings),
                         onPressed: () => context.push('/settings'),
                         visualDensity: VisualDensity.compact,

@@ -294,7 +294,7 @@ class _BillSplitterPageState extends ConsumerState<BillSplitterPage> {
             ),
         title: Text(name),
         subtitle: Text('Owes ${currencyFormat.format(_totalPerPerson)}'),
-        trailing: IconButton(icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.red), onPressed: onDelete),
+        trailing: IconButton(tooltip: 'Remove person', icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.red), onPressed: onDelete),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
       ),
@@ -316,6 +316,7 @@ class _BillSplitterPageState extends ConsumerState<BillSplitterPage> {
                   Expanded(child: TextField(controller: _manualNameController, decoration: const InputDecoration(hintText: 'Enter name manually...', prefixIcon: Icon(Icons.edit_rounded)))),
                   const SizedBox(width: 8),
                   IconButton.filledTonal(
+                    tooltip: 'Add person',
                     onPressed: () {
                       if (_manualNameController.text.isNotEmpty) {
                         setState(() { _manualPeople.add(_manualNameController.text); _manualNameController.clear(); _calculate(); });

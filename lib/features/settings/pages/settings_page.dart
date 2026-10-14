@@ -275,6 +275,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
+                        tooltip: 'Clear search',
                         icon: const Icon(Symbols.close_rounded, size: 20),
                         onPressed: () {
                           _searchController.clear();
