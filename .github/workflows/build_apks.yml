@@ -2,9 +2,9 @@ name: Build Wallet APKs
 
 on:
   push:
-    branches: [ main, develop, Improv, 'Improv-Sandbox', 'sandbox/**', 'sandbox/*', '*sandbox*', '*Sandbox*' ]
+    branches: [ main, Improv ]
   pull_request:
-    branches: [ main, develop, Improv, 'Improv-Sandbox', 'sandbox/**', 'sandbox/*', '*sandbox*', '*Sandbox*' ]
+    branches: [ main, Improv ]
   workflow_dispatch: # Allows manual trigger
 
 permissions:
@@ -355,27 +355,54 @@ jobs:
           done
           ls -lah
 
-      - name: Create GitHub Release (On Main Branch)
+      # Tag = pubspec version (e.g. v5.1.2). Releases once per version: pushes
+      # to main that don't bump pubspec.yaml build but don't re-release.
+      - name: Resolve Release Version
+        id: release
         if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          VERSION=$(grep -E '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*//; s/\+.*//' | tr -d '\r ')
+          TAG="v${VERSION}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists; skipping release."
+            echo "create=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "create=true" >> "$GITHUB_OUTPUT"
+          DL="https://github.com/${{ github.repository }}/releases/download/${TAG}"
+          {
+            echo "## 📱 Project Wallet Flutter ${TAG}"
+            echo
+            echo '<p align="center">'
+            echo "  <a href=\"${DL}/wallet-arm64-v8a.apk\">"
+            echo '    <img src="https://raw.githubusercontent.com/junksidetm/assests/d8774837b8c8658389ea37193a77a9a100414bc5/Images/badges/SVG%20-%20Version/Android%20Direct%20Link%20Frame.svg" alt="Direct APK Download" width="290" />'
+            echo '  </a>'
+            echo '</p>'
+            echo
+            if [ -f "release-notes/${TAG}.md" ]; then
+              cat "release-notes/${TAG}.md"
+              echo
+            fi
+            echo "### 🚀 Direct Standalone Downloads"
+            echo "- 📱 **Direct ARM64 APK (Recommended)**: [**wallet-arm64-v8a.apk**](${DL}/wallet-arm64-v8a.apk) *(Pure \`.apk\` for 64-bit devices)*"
+            echo "- 🌐 **Direct Universal APK**: [**wallet-universal.apk**](${DL}/wallet-universal.apk) *(All architectures bundled)*"
+            echo "- 📲 **Direct ARMv7 APK**: [**wallet-arm-v7a.apk**](${DL}/wallet-arm-v7a.apk)"
+            echo "- 💻 **Direct x86_64 APK**: [**wallet-x86_64.apk**](${DL}/wallet-x86_64.apk)"
+            echo
+            echo "_Build #${{ github.run_number }} · \`${GITHUB_SHA::7}\` · SHA-256 checksums attached._"
+          } > release-body.md
+
+      - name: Create GitHub Release (On Main Branch)
+        if: success() && steps.release.outputs.create == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0-b${{ github.run_number }}
-          name: "Wallet v1.0.0 (Build #${{ github.run_number }})"
+          tag_name: ${{ steps.release.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: "Wallet ${{ steps.release.outputs.tag }}"
           make_latest: true
-          body: |
-            ## 📱 Project Wallet Flutter v1.0.0 (Build #${{ github.run_number }})
-
-            <p align="center">
-              <a href="https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm64-v8a.apk">
-                <img src="https://raw.githubusercontent.com/junksidetm/assests/d8774837b8c8658389ea37193a77a9a100414bc5/Images/badges/SVG%20-%20Version/Android%20Direct%20Link%20Frame.svg" alt="Direct APK Download" width="290" />
-              </a>
-            </p>
-
-            ### 🚀 Direct Standalone Downloads
-            - 📱 **Direct ARM64 APK (Recommended)**: [**wallet-arm64-v8a.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm64-v8a.apk) *(Pure `.apk` for 64-bit devices)*
-            - 🌐 **Direct Universal APK**: [**wallet-universal.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-universal.apk) *(All architectures bundled)*
-            - 📲 **Direct ARMv7 APK**: [**wallet-arm-v7a.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm-v7a.apk)
-            - 💻 **Direct x86_64 APK**: [**wallet-x86_64.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-x86_64.apk)
+          body_path: release-body.md
           files: |
             build/app/outputs/final-apks/*.apk
             build/app/outputs/final-apks/*.sha256

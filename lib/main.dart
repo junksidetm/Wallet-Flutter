@@ -53,6 +53,8 @@ void main() async {
   );
 }
 
+bool _recurringChecked = false;
+
 class WalletApp extends ConsumerWidget {
   const WalletApp({super.key});
 
@@ -92,7 +94,12 @@ class WalletApp extends ConsumerWidget {
           builder: (context, child) {
             return isarInit.when(
               data: (_) {
-                ref.read(recurringServiceProvider).checkRecurringTransactions();
+                // builder re-runs on every theme/route rebuild; post due
+                // recurring entries only once per launch to avoid duplicates.
+                if (!_recurringChecked) {
+                  _recurringChecked = true;
+                  ref.read(recurringServiceProvider).checkRecurringTransactions();
+                }
                 return child!;
               },
               loading: () => const Scaffold(
