@@ -2,10 +2,13 @@ name: Build Wallet APKs
 
 on:
   push:
-    branches: [ main, develop, Improv ]
+    branches: [ main, develop, Improv, 'Improv-Sandbox', 'sandbox/**', 'sandbox/*', '*sandbox*', '*Sandbox*' ]
   pull_request:
-    branches: [ main, develop, Improv ]
+    branches: [ main, develop, Improv, 'Improv-Sandbox', 'sandbox/**', 'sandbox/*', '*sandbox*', '*Sandbox*' ]
   workflow_dispatch: # Allows manual trigger
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -23,115 +26,439 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '21'
+          java-version: '17'
           cache: 'gradle'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true
+          cache: false
+
+      - name: Setup Android SDK Platform
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" || true
+
+      - name: Grant Execute Permission for Gradlew
+        run: test -f android/gradlew && chmod +x android/gradlew || true
 
       - name: Install Dependencies
         run: |
+          flutter clean
           flutter doctor -v
-          yes | flutter doctor --android-licenses
+          yes | flutter doctor --android-licenses || true
           flutter pub get
 
       - name: Setup Signing (Optional)
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 || secrets.F_KEYSTORE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || secrets.F_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || secrets.F_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || secrets.F_KEY_ALIAS }}
         run: |
-          if [ ! -z "$KEYSTORE_BASE64" ]; then
-            echo "Decoding keystore..."
-            mkdir -p android/app
-            echo $KEYSTORE_BASE64 | base64 --decode > android/app/upload-keystore.jks
-            echo "storePassword=$KEYSTORE_PASSWORD" > android/key.properties
-            echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
-            echo "keyAlias=$KEY_ALIAS" >> android/key.properties
-            echo "storeFile=upload-keystore.jks" >> android/key.properties
-          else
-            echo "No signing secrets found. Building unsigned APKs."
+          mkdir -p android/app
+          mkdir -p ~/.android
+          
+          # Always generate default debug keystore so fallback debug signing never fails
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
+          
+          SIGNING_CONFIGURED=false
+          SIGNING_MODE="CI Fallback (Debug Keystore)"
+          
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Decoding release keystore..."
+            echo "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 --decode > android/app/upload-keystore.jks 2>/dev/null || true
+            
+            if [ -s android/app/upload-keystore.jks ]; then
+              # Detect or match key alias
+              TARGET_ALIAS=""
+              if [ -n "$KEY_ALIAS" ] && keytool -list -keystore android/app/upload-keystore.jks -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" > /dev/null 2>&1; then
+                echo "Found matching key alias: $KEY_ALIAS"
+                TARGET_ALIAS="$KEY_ALIAS"
+              else
+                DETECTED_ALIAS=$(keytool -list -v -keystore android/app/upload-keystore.jks -storepass "$KEYSTORE_PASSWORD" 2>/dev/null | grep -i "Alias name:" | head -n 1 | sed 's/[Aa]lias name:\s*//' | tr -d '\r\n')
+                if [ -z "$DETECTED_ALIAS" ]; then
+                  DETECTED_ALIAS=$(keytool -list -keystore android/app/upload-keystore.jks -storepass "$KEYSTORE_PASSWORD" 2>/dev/null | awk -F',' '/PrivateKeyEntry/ {print $1}' | head -n 1 | tr -d '\r\n ')
+                fi
+                if [ -n "$DETECTED_ALIAS" ]; then
+                  echo "Auto-detected key alias in keystore: $DETECTED_ALIAS (configured was: '$KEY_ALIAS')"
+                  TARGET_ALIAS="$DETECTED_ALIAS"
+                fi
+              fi
+
+              if [ -n "$TARGET_ALIAS" ]; then
+                # Pre-flight check: Test if private key can be decrypted using Java KeyStore API (exact same as Gradle)
+                printf '%s\n' \
+                  'import java.io.File;' \
+                  'import java.io.FileInputStream;' \
+                  'import java.security.Key;' \
+                  'import java.security.KeyStore;' \
+                  'public class TestKey {' \
+                  '    public static void main(String[] args) {' \
+                  '        if (args.length < 4) System.exit(1);' \
+                  '        String ksPath = args[0];' \
+                  '        String storePass = args[1];' \
+                  '        String alias = args[2];' \
+                  '        String keyPass = args[3];' \
+                  '        try {' \
+                  '            File f = new File(ksPath);' \
+                  '            KeyStore ks;' \
+                  '            try {' \
+                  '                ks = KeyStore.getInstance("PKCS12");' \
+                  '                try (FileInputStream fis = new FileInputStream(f)) {' \
+                  '                    ks.load(fis, storePass.toCharArray());' \
+                  '                }' \
+                  '            } catch (Exception e) {' \
+                  '                ks = KeyStore.getInstance("JKS");' \
+                  '                try (FileInputStream fis = new FileInputStream(f)) {' \
+                  '                    ks.load(fis, storePass.toCharArray());' \
+                  '                }' \
+                  '            }' \
+                  '            Key k = ks.getKey(alias, keyPass.toCharArray());' \
+                  '            if (k != null) {' \
+                  '                System.exit(0);' \
+                  '            }' \
+                  '        } catch (Exception e) {' \
+                  '            System.exit(2);' \
+                  '        }' \
+                  '        System.exit(3);' \
+                  '    }' \
+                  '}' > TestKey.java
+                
+                KEY_VERIFIED=false
+                TARGET_KEY_PASS=""
+                
+                # Test 1: Try KEY_PASSWORD if provided
+                if [ -n "$KEY_PASSWORD" ] && java TestKey.java android/app/upload-keystore.jks "$KEYSTORE_PASSWORD" "$TARGET_ALIAS" "$KEY_PASSWORD" > /dev/null 2>&1; then
+                  echo "Private key verified with KEY_PASSWORD."
+                  TARGET_KEY_PASS="$KEY_PASSWORD"
+                  KEY_VERIFIED=true
+                # Test 2: Try KEYSTORE_PASSWORD as key password
+                elif [ -n "$KEYSTORE_PASSWORD" ] && java TestKey.java android/app/upload-keystore.jks "$KEYSTORE_PASSWORD" "$TARGET_ALIAS" "$KEYSTORE_PASSWORD" > /dev/null 2>&1; then
+                  echo "Private key verified with KEYSTORE_PASSWORD."
+                  TARGET_KEY_PASS="$KEYSTORE_PASSWORD"
+                  KEY_VERIFIED=true
+                fi
+                
+                rm -f TestKey.java
+                
+                if [ "$KEY_VERIFIED" = "true" ]; then
+                  SIGNING_CONFIGURED=true
+                  SIGNING_MODE="Production Release Keystore (Alias: $TARGET_ALIAS)"
+                  printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=upload-keystore.jks\n" "$KEYSTORE_PASSWORD" "$TARGET_KEY_PASS" "$TARGET_ALIAS" > android/key.properties
+                  echo "Successfully configured release signing with alias: $TARGET_ALIAS"
+                else
+                  echo "::warning title=Keystore Key Password Mismatch::Could not decrypt private key for alias '$TARGET_ALIAS' with KEY_PASSWORD or KEYSTORE_PASSWORD. Falling back to CI debug keystore."
+                fi
+              else
+                echo "::warning title=No Key Alias Found::No PrivateKeyEntry found in provided release keystore. Falling back to CI debug keystore."
+              fi
+            else
+              echo "::warning title=Invalid Keystore::Decoded release keystore is empty or invalid base64. Falling back to CI debug keystore."
+            fi
+          fi
+          
+          if [ "$SIGNING_CONFIGURED" != "true" ]; then
+            echo "Configuring CI fallback keystore..."
+            rm -f android/app/upload-keystore.jks
+            keytool -genkey -v -keystore android/app/upload-keystore.jks -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            printf "storePassword=android\nkeyPassword=android\nkeyAlias=androiddebugkey\nstoreFile=upload-keystore.jks\n" > android/key.properties
+            echo "CI fallback keystore configured successfully."
+          fi
+          
+          echo "SIGNING_MODE=$SIGNING_MODE" >> $GITHUB_ENV
 
       - name: Code Generation (Build Runner)
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs || true
+
+      - name: Prepare Output Directories
+        run: |
+          mkdir -p build/app/outputs/symbols
+          mkdir -p build/app/outputs/final-apks
 
       - name: Build Universal APK
-        id: build_universal
         run: |
+          set -o pipefail
           echo "Building Universal (Fat) APK..."
-          flutter clean
-          flutter pub get
-          mkdir -p build/app/outputs/symbols
-          # Run build and allow it to fail if APK is not found, we will check manual paths next
-          flutter build apk --obfuscate --split-debug-info=build/app/outputs/symbols --release --no-tree-shake-icons --verbose || true
+          flutter build apk --obfuscate --split-debug-info=build/app/outputs/symbols --release --no-tree-shake-icons --android-skip-build-dependency-validation 2>&1 | tee build_universal.log
           
-          # Manually locate APK if standard path is empty
-          if [ ! -f build/app/outputs/flutter-apk/app-release.apk ]; then
-            echo "Standard APK path not found. Searching in android/app/build/outputs/apk/release/..."
-            mkdir -p build/app/outputs/flutter-apk
-            cp android/app/build/outputs/apk/release/app-release.apk build/app/outputs/flutter-apk/app-release.apk || echo "APK not found in android/app path either."
+          # Immediately preserve universal APK before split-abi build overwrites outputs
+          echo "Locating Universal APK..."
+          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/final-apks/wallet-universal.apk
+          elif [ -f build/app/outputs/flutter-apk/app-release-unsigned.apk ]; then
+            cp build/app/outputs/flutter-apk/app-release-unsigned.apk build/app/outputs/final-apks/wallet-universal.apk
+          else
+            for apk in $(find build android -name "*.apk" 2>/dev/null); do
+              if [[ "$apk" != *"arm"* ]] && [[ "$apk" != *"x86"* ]] && [[ "$apk" != *"final-apks"* ]]; then
+                echo "Found Universal APK at: $apk"
+                cp "$apk" build/app/outputs/final-apks/wallet-universal.apk
+                break
+              fi
+            done
           fi
 
       - name: Build Split APKs
-        if: success() || failure()
         run: |
+          set -o pipefail
           echo "Building Split-ABI APKs..."
-          flutter build apk --split-per-abi --obfuscate --split-debug-info=build/app/outputs/symbols --release --no-tree-shake-icons --verbose || true
+          flutter build apk --split-per-abi --obfuscate --split-debug-info=build/app/outputs/symbols --release --no-tree-shake-icons --android-skip-build-dependency-validation 2>&1 | tee build_split.log
           
-          # Manually locate Split APKs
-          if [ ! -f build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ]; then
-             echo "Split APKs not found in standard path. Searching in android/app/build/outputs/apk/release/..."
-             cp android/app/build/outputs/apk/release/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/app-arm64-v8a-release.apk || true
-             cp android/app/build/outputs/apk/release/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk || true
-             cp android/app/build/outputs/apk/release/app-x86_64-release.apk build/app/outputs/flutter-apk/app-x86_64-release.apk || true
-          fi
-
-      - name: Error Analysis (On Failure)
-        if: failure()
-        run: |
-          echo "::error::Build failed! Analyzing logs for critical errors..."
-          # Final check if any APK was actually generated
-          if [ ! -f build/app/outputs/flutter-apk/app-release.apk ]; then
-             echo "CRITICAL: No APK found after manual search. Build is truly failed."
-             exit 1
-          fi
-
-      - name: Process & Rename APKs
-        if: success()
-        run: |
-          mkdir -p build/app/outputs/final-apks
-          
-          # Check for Universal APK
-          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
-            mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/final-apks/wallet-universal.apk
-          fi
-          
-          # Check for Split APKs
+          # Preserve split APKs
+          echo "Locating Split APKs..."
           if [ -f build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ]; then
-            mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/final-apks/wallet-arm64-v8a.apk
+            cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/final-apks/wallet-arm64-v8a.apk
+          fi
+          if [ -f build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ]; then
+            cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/final-apks/wallet-arm-v7a.apk
+          fi
+          if [ -f build/app/outputs/flutter-apk/app-x86_64-release.apk ]; then
+            cp build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/final-apks/wallet-x86_64.apk
+          fi
+          for apk in $(find build android -name "*.apk" 2>/dev/null); do
+            if [[ "$apk" == *"final-apks"* ]]; then continue; fi
+            if [[ "$apk" == *"arm64"* ]] && [ ! -f build/app/outputs/final-apks/wallet-arm64-v8a.apk ]; then
+              cp "$apk" build/app/outputs/final-apks/wallet-arm64-v8a.apk
+            elif ([[ "$apk" == *"armeabi"* ]] || [[ "$apk" == *"arm-v7a"* ]]) && [ ! -f build/app/outputs/final-apks/wallet-arm-v7a.apk ]; then
+              cp "$apk" build/app/outputs/final-apks/wallet-arm-v7a.apk
+            elif [[ "$apk" == *"x86_64"* ]] && [ ! -f build/app/outputs/final-apks/wallet-x86_64.apk ]; then
+              cp "$apk" build/app/outputs/final-apks/wallet-x86_64.apk
+            fi
+          done
+
+      - name: Verify Output APKs
+        run: |
+          echo "All APKs generated across workspace:"
+          find build android -name "*.apk" 2>/dev/null || true
+          echo "Final APKs staged for artifact upload:"
+          ls -lah build/app/outputs/final-apks/ || true
+          
+          PRIMARY_APK=""
+          if [ -f build/app/outputs/final-apks/wallet-universal.apk ]; then
+            PRIMARY_APK="build/app/outputs/final-apks/wallet-universal.apk"
+          elif [ -f build/app/outputs/final-apks/wallet-arm64-v8a.apk ]; then
+            PRIMARY_APK="build/app/outputs/final-apks/wallet-arm64-v8a.apk"
           fi
           
-          if [ -f build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ]; then
-            mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/final-apks/wallet-arm-v7a.apk
+          if [ -z "$PRIMARY_APK" ]; then
+            echo "::error::No APKs were preserved in final-apks!"
+            exit 1
           fi
+          
+          echo "================ APK SIGNATURE VERIFICATION ================"
+          CERT_INFO=$(keytool -printcert -jarfile "$PRIMARY_APK" 2>&1 || true)
+          echo "$CERT_INFO"
+          
+          SIGNER_OWNER=$(echo "$CERT_INFO" | grep -i "Owner:" | head -n 1 | sed 's/[Oo]wner:\s*//')
+          SIGNER_ISSUER=$(echo "$CERT_INFO" | grep -i "Issuer:" | head -n 1 | sed 's/[Ii]ssuer:\s*//')
+          SIGNER_SHA256=$(echo "$CERT_INFO" | grep -i "SHA256:" | head -n 1 | sed 's/.*SHA256:\s*//')
+          
+          echo "SIGNER_OWNER=$SIGNER_OWNER" >> $GITHUB_ENV
+          echo "SIGNER_ISSUER=$SIGNER_ISSUER" >> $GITHUB_ENV
+          echo "SIGNER_SHA256=$SIGNER_SHA256" >> $GITHUB_ENV
+          echo "============================================================"
 
       - name: Upload Build Artifacts
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Wallet-APKs
           path: build/app/outputs/final-apks/*.apk
+          if-no-files-found: error
           retention-days: 7
 
       - name: Upload Debug Symbols
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Debug-Symbols
           path: build/app/outputs/symbols/*
+          if-no-files-found: warn
           retention-days: 7
+
+      - name: Publish Errors to Job Summary
+        if: failure()
+        run: |
+          cat << 'EOF' >> $GITHUB_STEP_SUMMARY
+          # ❌ Wallet Flutter — Build Failed
+
+          <p align="center">
+            <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">
+              <img src="https://raw.githubusercontent.com/${{ github.repository }}/main/assets/images/Testing%20APK%20Fail.svg" alt="Testing APK Fail" height="100" />
+            </a>
+          </p>
+
+          > [!WARNING]
+          > **Build Execution Failure**:
+          > One or more compilation, build, or packaging tasks failed during workflow execution.
+          > Review the compiler error diagnostics below or download the failure logs from the Artifacts section below to troubleshoot.
+
+          ---
+
+          ### 🔍 Compiler & Build Diagnostics
+          ```text
+          EOF
+
+          LOG_FILE=""
+          if [ -f build_split.log ] && [ -s build_split.log ]; then
+            LOG_FILE="build_split.log"
+          elif [ -f build_universal.log ] && [ -s build_universal.log ]; then
+            LOG_FILE="build_universal.log"
+          fi
+          
+          if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" ]; then
+            tail -n 120 "$LOG_FILE" >> $GITHUB_STEP_SUMMARY
+            ANNOTATION_MSG=$(tail -n 30 "$LOG_FILE" | tr '\r\n' ' | ' | sed 's/[^a-zA-Z0-9 ._:\/|-]/ /g' | cut -c 1-500)
+            echo "::error title=Build Error::$ANNOTATION_MSG"
+          else
+            echo "No build log found or failure occurred in a setup step." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<details><summary>📋 <b>Full Build Log Tail</b> (Click to expand)</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 200 "$LOG_FILE" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          cat << 'EOF' >> $GITHUB_STEP_SUMMARY
+
+          ---
+
+          ### 📦 Diagnostic Artifacts
+          - 📄 **Build Failure Logs**: `build-failure-logs` *(Available in the Artifacts section below)*
+          - ⚙️ **Workflow Run Details**: [Workflow Run #${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+
+      - name: Upload Build Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-failure-logs
+          path: "*.log"
+          if-no-files-found: ignore
+          retention-days: 2
+
+      - name: Generate Checksums
+        if: success()
+        run: |
+          cd build/app/outputs/final-apks
+          for apk in *.apk; do
+            if [ -f "$apk" ]; then
+              sha256sum "$apk" > "$apk.sha256"
+            fi
+          done
+          ls -lah
+
+      - name: Create GitHub Release (On Main Branch)
+        if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-b${{ github.run_number }}
+          name: "Wallet v1.0.0 (Build #${{ github.run_number }})"
+          make_latest: true
+          body: |
+            ## 📱 Project Wallet Flutter v1.0.0 (Build #${{ github.run_number }})
+
+            <p align="center">
+              <a href="https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm64-v8a.apk">
+                <img src="https://raw.githubusercontent.com/junksidetm/assests/d8774837b8c8658389ea37193a77a9a100414bc5/Images/badges/SVG%20-%20Version/Android%20Direct%20Link%20Frame.svg" alt="Direct APK Download" width="290" />
+              </a>
+            </p>
+
+            ### 🚀 Direct Standalone Downloads
+            - 📱 **Direct ARM64 APK (Recommended)**: [**wallet-arm64-v8a.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm64-v8a.apk) *(Pure `.apk` for 64-bit devices)*
+            - 🌐 **Direct Universal APK**: [**wallet-universal.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-universal.apk) *(All architectures bundled)*
+            - 📲 **Direct ARMv7 APK**: [**wallet-arm-v7a.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-arm-v7a.apk)
+            - 💻 **Direct x86_64 APK**: [**wallet-x86_64.apk**](https://github.com/${{ github.repository }}/releases/download/v1.0.0-b${{ github.run_number }}/wallet-x86_64.apk)
+          files: |
+            build/app/outputs/final-apks/*.apk
+            build/app/outputs/final-apks/*.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Success to Job Summary
+        if: success()
+        run: |
+          cat << 'EOF' >> $GITHUB_STEP_SUMMARY
+          # 🚀 Wallet Flutter — Production Build Summary
+
+          <p align="center">
+            <a href="https://github.com/${{ github.repository }}/releases/latest/download/wallet-arm64-v8a.apk">
+              <img src="https://raw.githubusercontent.com/${{ github.repository }}/main/assets/images/Testing%20APK%20Pass.svg" alt="Testing APK Pass" height="100" />
+            </a>
+          </p>
+
+          > [!NOTE]
+          > **Notice regarding downloaded formats**:
+          > Clicking on any of the build artifacts in the **Artifacts** section at the bottom of this Actions page will download them packaged inside a `.zip` file.
+          > To download the standalone, pure `.apk` directly to your phone/device ready to install without extracting any zip files, click the **Testing APK Pass** badge above (ARM64-v8a) or use the direct links below!
+
+          ---
+
+          ### 📦 Build Artifacts & Direct Downloads
+          - 📱 **Direct ARM64 APK**: [**wallet-arm64-v8a.apk**](https://github.com/${{ github.repository }}/releases/latest/download/wallet-arm64-v8a.apk) *(Pure `.apk` for 64-bit devices, no unzipping required)*
+          - 🌐 **Direct Universal APK**: [**wallet-universal.apk**](https://github.com/${{ github.repository }}/releases/latest/download/wallet-universal.apk) *(Pure `.apk` with all architectures bundled)*
+          - 🏷️ **GitHub Releases Portal**: [Latest Releases Page](https://github.com/${{ github.repository }}/releases/latest)
+          - 📦 **Actions Build Artifacts**: `Wallet-APKs` *(Available in the Artifacts section below — contains ARM64, ARMv7, x86_64, and Universal APKs)*
+          - 🔍 **Debug Symbols**: `Debug-Symbols` *(Available in the Artifacts section below)*
+
+          ---
+
+          <details>
+          <summary>🛠️ <b>Build & Architecture Specifications</b> (Click to expand)</summary>
+
+          <br/>
+
+          | Attribute | Specification | Notes |
+          | :--- | :--- | :--- |
+          | **Target Platform** | Android 5.0+ to Android 15 (API 21–35/36) | Min SDK 21, Target/Compile SDK 36 |
+          | **Target ABIs** | `arm64-v8a`, `armeabi-v7a`, `x86_64` | Split-per-ABI + Fat Universal |
+          | **Framework** | **Flutter** (Stable Channel) | Dart 3.x with AOT compilation |
+          | **Code Obfuscation** | Enabled (`--obfuscate`) | Symbols preserved in `Debug-Symbols` |
+          | **State Management** | **Riverpod 2.0** | Generator-driven reactive state |
+          | **Local Database** | **Isar Database** | Fast, ACID-compliant local NoSQL engine |
+          | **Design Language** | **Material 3 Expressive** | Expressive geometry, smooth animations, dynamic color tokens |
+
+          </details>
+
+          <details>
+          <summary>🔐 <b>APK Signature & Security Details</b> (Click to expand)</summary>
+
+          <br/>
+
+          EOF
+
+          MODE="${SIGNING_MODE:-CI Fallback (Debug Keystore)}"
+          OWNER="${SIGNER_OWNER:-Android Debug}"
+          ISSUER="${SIGNER_ISSUER:-Android Debug}"
+          SHA256="${SIGNER_SHA256:-N/A}"
+
+          cat << EOF >> $GITHUB_STEP_SUMMARY
+          | Property | Value |
+          | :--- | :--- |
+          | **Signing Mode** | $MODE |
+          | **Certificate Owner** | \`$OWNER\` |
+          | **Certificate Issuer** | \`$ISSUER\` |
+          | **SHA-256 Fingerprint** | \`$SHA256\` |
+
+          </details>
+
+          <details>
+          <summary>✨ <b>Key Features & Highlights</b> (Click to expand)</summary>
+
+          <br/>
+
+          - 💳 **Expressive Account Cards**: Smooth gesture cards with dynamic color accents and balance privacy toggle.
+          - 📊 **Canvas-Rendered Visualizations**: Custom canvas financial charts and spending analytics.
+          - ⚡ **Offline-First High Performance**: Sub-millisecond queries powered by Isar local storage.
+          - 🔀 **Split-ABI Lightweight Binaries**: Minimal download footprint optimized per device architecture.
+          - 🔒 **Obfuscated Production Builds**: Symbol table stripping and mapping preservation for release security.
+
+          </details>
+          EOF

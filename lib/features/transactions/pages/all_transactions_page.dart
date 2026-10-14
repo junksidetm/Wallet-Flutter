@@ -4,8 +4,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/database/providers.dart';
 import '../../../core/database/models/transaction_model.dart';
-import '../../../core/widgets/transaction_list_tile.dart';
-import '../../../core/widgets/transaction_search_anchor.dart';
+import '../../../core/widgets/transaction_segmented_group.dart';
+import '../../../core/widgets/app_back_button.dart';
 
 class AllTransactionsPage extends ConsumerStatefulWidget {
   const AllTransactionsPage({super.key});
@@ -18,195 +18,203 @@ class AllTransactionsPage extends ConsumerStatefulWidget {
 class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
   bool _ascending = false;
   bool _showArchived = false;
+  TransactionType? _typeFilter;
 
   @override
   Widget build(BuildContext context) {
-    final transactionsAsync = _showArchived 
+    final theme = Theme.of(context);
+    final transactionsAsync = _showArchived
         ? ref.watch(archivedTransactionsStreamProvider)
         : ref.watch(allTransactionsStreamProvider);
-    
+
     final sortType = ref.watch(transactionSortProvider);
     final accountsAsync = ref.watch(accountsStreamProvider);
-    
-    final colorScheme = Theme.of(context).colorScheme;
+
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_showArchived ? 'Archived Transactions' : 'All Transactions'),
-        actions: [
-          IconButton(
-            onPressed: () => setState(() => _showArchived = !_showArchived),
-            icon: Icon(_showArchived ? Symbols.inbox : Symbols.archive),
-            tooltip: _showArchived ? 'Show Active' : 'Show Archived',
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.medium(
+            leading: const AppBackButton(),
+            title: Text(
+              _showArchived ? 'Archived' : 'Transactions',
+              style: theme.textTheme.headlineLarge?.copyWith(
+                fontSize: (theme.textTheme.headlineLarge?.fontSize ?? 32) + 3,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
           ),
-          PopupMenuButton<TransactionSort>(
-            icon: const Icon(Symbols.sort),
-            tooltip: 'Sort Transactions',
-            onSelected: (value) {
-              ref.read(transactionSortProvider.notifier).state = value;
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: TransactionSort.date,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    Icon(Symbols.calendar_month, color: sortType == TransactionSort.date ? colorScheme.primary : null),
+                    _buildPill(
+                      context: context,
+                      icon: Symbols.calendar_month_rounded,
+                      label: 'Date',
+                      isSelected: sortType == TransactionSort.date,
+                      onTap: () {
+                        ref.read(transactionSortProvider.notifier).state =
+                            TransactionSort.date;
+                      },
+                    ),
                     const SizedBox(width: 8),
-                    const Text('Date'),
+                    _buildPill(
+                      context: context,
+                      icon: Symbols.account_balance_wallet_rounded,
+                      label: 'Account',
+                      isSelected: sortType == TransactionSort.account,
+                      onTap: () {
+                        ref.read(transactionSortProvider.notifier).state =
+                            TransactionSort.account;
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPill(
+                      context: context,
+                      icon: _ascending
+                          ? Symbols.arrow_upward_rounded
+                          : Symbols.arrow_downward_rounded,
+                      label: _ascending ? 'Oldest' : 'Newest',
+                      isSelected: _ascending,
+                      onTap: () => setState(() => _ascending = !_ascending),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPill(
+                      context: context,
+                      icon: _typeFilter == null
+                          ? Symbols.filter_list_rounded
+                          : _typeFilter == TransactionType.income
+                              ? Symbols.arrow_downward_rounded
+                              : _typeFilter == TransactionType.expense
+                                  ? Symbols.arrow_upward_rounded
+                                  : Symbols.sync_alt_rounded,
+                      label: _typeFilter == null
+                          ? 'All Types'
+                          : _typeFilter!.name.toUpperCase(),
+                      isSelected: _typeFilter != null,
+                      onTap: () {
+                        setState(() {
+                          if (_typeFilter == null) {
+                            _typeFilter = TransactionType.expense;
+                          } else if (_typeFilter == TransactionType.expense) {
+                            _typeFilter = TransactionType.income;
+                          } else if (_typeFilter == TransactionType.income) {
+                            _typeFilter = TransactionType.transfer;
+                          } else {
+                            _typeFilter = null;
+                          }
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPill(
+                      context: context,
+                      icon: _showArchived
+                          ? Symbols.archive_rounded
+                          : Symbols.inbox_rounded,
+                      label: _showArchived ? 'Archived' : 'Active',
+                      isSelected: _showArchived,
+                      onTap: () =>
+                          setState(() => _showArchived = !_showArchived),
+                    ),
                   ],
                 ),
               ),
-              PopupMenuItem(
-                value: TransactionSort.account,
-                child: Row(
-                  children: [
-                    Icon(Symbols.account_balance_wallet, color: sortType == TransactionSort.account ? colorScheme.primary : null),
-                    const SizedBox(width: 8),
-                    const Text('Account'),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-          IconButton(
-            onPressed: () => setState(() => _ascending = !_ascending),
-            icon: Icon(_ascending ? Symbols.arrow_upward : Symbols.arrow_downward),
-            tooltip: 'Toggle Order',
-          ),
-        ],
-      ),
-      body: transactionsAsync.when(
-        data: (transactions) {
-          if (transactions.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Symbols.receipt_long, size: 64, color: colorScheme.outline),
-                  const SizedBox(height: 16),
-                  Text('No transactions found', style: Theme.of(context).textTheme.titleMedium),
-                ],
-              ),
-            );
-          }
+          transactionsAsync.when(
+            data: (transactions) {
+              var filteredTxs = transactions;
+              if (_typeFilter != null) {
+                filteredTxs =
+                    filteredTxs.where((t) => t.type == _typeFilter).toList();
+              }
 
-          final sortedTxs = [...transactions]);
-          
-          if (sortType == TransactionSort.date) {
-            sortedTxs.sort((a, b) => _ascending 
-                ? a.date.compareTo(b.date) 
-                : b.date.compareTo(a.date));
-          } else if (sortType == TransactionSort.account) {
-            // Sort by Account basis with date & time sorting
-            accountsAsync.whenData((accounts) {
-              sortedTxs.sort((a, b) {
-                final accA = accounts.where((acc) => acc.id == a.accountId).firstOrNull;
-                final accB = accounts.where((acc) => acc.id == b.accountId).firstOrNull;
-                
-                final nameA = accA?.name ?? '';
-                final nameB = accB?.name ?? '';
-                
-                final accountCompare = _ascending ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
-                
-                if (accountCompare != 0) return accountCompare;
-                
-                // Secondary sort by date
-                return b.date.compareTo(a.date); // Always show newest first within same account? 
-                // Or follow _ascending for date too? 
-                // User said "via Account basis with date & time sorting". 
-                // Usually this means newest first.
-              });
-            });
-          }
-
-          return Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TransactionSearchAnchor(),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-            itemCount: sortedTxs.length,
-            itemBuilder: (context, index) {
-              final tx = sortedTxs[index]);
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Dismissible(
-                  key: ValueKey('tx-${tx.id}-${tx.updatedAt.millisecondsSinceEpoch}'),
-                  secondaryBackground: _buildArchiveBackground(context),
-                  background: _buildDeleteBackground(context),
-                  confirmDismiss: (direction) async {
-                    if (direction == DismissDirection.startToEnd) {
-                      return await _confirmDelete(context, tx);
-                    } else {
-                      await _handleArchive(tx);
-                      return false; // Don't remove from list manually, stream will handle it
-                    }
-                  },
-                  onDismissed: (direction) {
-                    if (direction == DismissDirection.startToEnd) {
-                      _handleDelete(tx);
-                    }
-                  },
-                  child: TransactionListTile(
-                    tx: tx,
-                    onTap: () => context.push('/add_transaction', extra: tx),
+              if (filteredTxs.isEmpty) {
+                return SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Symbols.receipt_long,
+                            size: 64, color: colorScheme.outline),
+                        const SizedBox(height: 16),
+                        Text('No transactions found',
+                            style: theme.textTheme.titleMedium),
+                      ],
+                    ),
                   ),
+                );
+              }
+
+              final sortedTxs = [...filteredTxs];
+
+              if (sortType == TransactionSort.date) {
+                sortedTxs.sort((a, b) => _ascending
+                    ? a.date.compareTo(b.date)
+                    : b.date.compareTo(a.date));
+              } else if (sortType == TransactionSort.account) {
+                accountsAsync.whenData((accounts) {
+                  sortedTxs.sort((a, b) {
+                    final accA = accounts
+                        .where((acc) => acc.id == a.accountId)
+                        .firstOrNull;
+                    final accB = accounts
+                        .where((acc) => acc.id == b.accountId)
+                        .firstOrNull;
+
+                    final nameA = accA?.name ?? '';
+                    final nameB = accB?.name ?? '';
+
+                    final accountCompare = _ascending
+                        ? nameA.compareTo(nameB)
+                        : nameB.compareTo(nameA);
+
+                    if (accountCompare != 0) return accountCompare;
+
+                    return b.date.compareTo(a.date);
+                  });
+                });
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverTransactionGroupedList(
+                  transactions: sortedTxs,
+                  enableDismiss: true,
+                  isArchivedView: _showArchived,
+                  onTap: (tx) => context.push('/add_transaction', extra: tx),
+                  onConfirmDelete: (tx) => _confirmDelete(context, tx),
+                  onDelete: (tx) => _handleDelete(tx),
+                  onArchive: (tx) => _handleArchive(tx),
                 ),
               );
             },
+            loading: () => const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (err, _) => SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: Text('Error: $err')),
+            ),
           ),
-        ),
-      ]);
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
-      ),
-    );
-  }
-
-  Widget _buildDeleteBackground(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.redAccent,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Row(
-        children: [
-          Icon(Symbols.delete_forever, color: Colors.white),
-          SizedBox(width: 8),
-          Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildArchiveBackground(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerRight,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(_showArchived ? 'Unarchive' : 'Archive', 
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          const SizedBox(width: 8),
-          Icon(_showArchived ? Symbols.unarchive : Symbols.archive, color: Colors.white),
         ],
       ),
     );
   }
 
   Future<bool> _confirmDelete(BuildContext context, TransactionModel tx) async {
+    final colorScheme = Theme.of(context).colorScheme;
     return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -216,7 +224,7 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: colorScheme.error),
             child: const Text('Delete'),
           ),
         ],
@@ -245,5 +253,60 @@ class _AllTransactionsPageState extends ConsumerState<AllTransactionsPage> {
         SnackBar(content: Text( _showArchived ? 'Transaction unarchived' : 'Transaction archived')),
       );
     }
+  }
+
+  Widget _buildPill({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Material(
+      color: isSelected
+          ? colorScheme.primaryContainer
+          : colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
+      borderRadius: BorderRadius.circular(100),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(100),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: isSelected
+                  ? colorScheme.primary.withValues(alpha: 0.4)
+                  : colorScheme.outlineVariant.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  color: isSelected
+                      ? colorScheme.onPrimaryContainer
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -53,6 +53,8 @@ class _WalletCarouselState extends State<WalletCarousel> {
         controller: _controller,
         itemExtent: widget.itemExtent,
         shrinkExtent: 200.0,
+        // Let cards handle their own taps (e.g. AccountCard edit button).
+        enableSplash: false,
         onTap: (index) {
           HapticFeedback.lightImpact();
         },

@@ -315,3 +315,179 @@ ont_awesome_flutter\ v11 APIs.
   - **Add Transaction (Tactile Keypad):** Integrated the `TactileKeypad` into `add_transaction_page.dart`. Disabled the native system keyboard for the amount field to create a cohesive, haptic-enabled, fully immersive native amount entry experience.
   - **All Transactions (Search Anchor):** Injected the `TransactionSearchAnchor` into the top of `all_transactions_page.dart`, instantly upgrading the list view with a floating, morphable M3 search bar.
 - **Status:** 100% (Integration complete on Improv branch).
+## [2026-08-24 10:15] - The Expressive Architecture Update (v4.0.5)
+- **Action:** Upgraded project to version 4.0.5 with full Material 3 Expressive redesign, settings revamp, and toolchain stabilization.
+- **Changes:**
+  - **Version Upgrade:** Bumped project version to `4.0.5+1` across `pubspec.yaml`, `about_page.dart`, and UI components.
+  - **Connected Layouts:** Implemented `TransactionSegmentedGroup` with adaptive squircle geometry (28dp outer, 4dp inner dividers) across Home, Transactions, Accounts, and People.
+  - **Heatmap Calendar:** Refined `ActivityHeatmapPage` with contrast-aware white text for dates with transaction records across all dynamic theme palettes.
+  - **Standardized Navigation:** Created universal `AppBackButton` (40x40 squircle badge) and medium flexible AppBars with `scrolledUnderElevation: 3.0` enforcing hierarchical return to Home.
+  - **Settings & Personalization:** Modularized Settings into sub-pages (General, Personalization, Backup & Restore, Privacy & Security, About) with live search and connected cards. Added dynamic 3-segment color preview painter (`_PalettePainter`), compact S-size sliders with value bubbles, and font selector with `Google Sans Flex` preview.
+  - **Developer Profile & Easter Egg:** Separated developer profile into dedicated card with GitHub/Email pill buttons and added 7-tap version badge gesture to unlock LogCat Error Collector.
+  - **Loans & People:** Added collapsible section toggles in Loans, pill-shaped swipe backgrounds, and instant person contact creation.
+  - **Persistence & Safety:** Stabilized Isar stream link hydration, UUID preservation, and lifecycle memory safety.
+  - **Toolchain & CI/CD:** Stabilized AGP 8.11.1 / 8.13.0 and Gradle 8.11.1 / 8.14.5 targeting SDK 35/36 with fallback keystore generation, CodeQL workflow, and multi-ABI APK verification.
+- **Status:** 100% (All features verified, release notes generated, ready for merge).
+
+## [2026-08-26 23:20] - Version 4.5.5: Typography, Recurring Notifications & Calendar Heatmap Navigation
+- **Action:** Upgraded project to version 4.5.5 (September 2026) with dynamic balance variable typography, recurring bill notification system with customizable timing, home heatmap month navigation, full history expansion, and contrast-aware theme rendering.
+- **Changes:**
+  - **Version Upgrade:** Bumped application version to `v4.5.5+1 (September 2026)` across `pubspec.yaml`, `about_page.dart`, and `settings_page.dart`.
+  - **Variable Font Typography:**
+    - Live Preview type tester sample text updated to include numeric sequence `1234567890` after `...lazy dog`.
+    - Dynamic variable font variations for Home Screen total balance cards (`AnimatedBalanceHero` and `TotalBalanceCard`):
+      - 1-4 digits: `GRAD=59.0`, `wght=797.0`, `wdth=131.0`, `ROND=42.0`, `opsz=86.0`.
+      - 12+ digits: `wght=100.0`, `wdth=50.0`.
+      - Smooth linear interpolation scaling between 4 and 12 digits, fitted with `BoxFit.scaleDown` to ensure flawless rendering across all screen sizes.
+  - **Recurring Bill Notifications & Scheduling:**
+    - Added `notifyOneDayBefore` field to `Recurring` model with full Isar schema and serialization support.
+    - Updated `AddEditRecurringPage` with Material 3 Expressive `SegmentedButton` to select reminder timing: "Same Day" vs "One Day Before".
+    - Enhanced `NotificationService` with `scheduleRecurringBillNotification` and `cancelNotification` targeting exact 9:00 AM alarm triggers.
+    - Integrated `RecurringService` with `NotificationService` to automatically dispatch instant notifications ("Bill Due" / "Your <frequency> payment for <name> is due") upon occurrence processing and reschedule for upcoming cycles.
+    - Added automatic due recurring checks on database ready in `main.dart`.
+    - Displayed reminder timing metadata in `RecurringPage` list items.
+  - **Calendar Heatmap & Activity History Navigation:**
+    - Added month-switching navigation buttons (`<` and `>`) to the Home Screen `ActivityInsightsSection` allowing users to browse past and future months directly.
+    - Header arrow on Home Screen expands to the full `ActivityHeatmapPage` showing complete multi-year, multi-month history.
+    - Fixed contrast color rendering in both Home Heatmap and Activity History:
+      - Light mode: Date text inside active/highlighted squares switches to crisp white (`Colors.white`).
+      - Dark mode: Date text inside active/highlighted squares switches to crisp black (`Colors.black`) for optimal legibility.
+- **Status:** 100% (All features implemented, static analysis verified with 0 errors).
+
+## [2026-08-27 00:05] - Recent Transactions Upper Squircle Section, Pill Filters & Heatmap Stream Fix
+- **Action:** Implemented contrasting upper-squircle Recent Transactions section on Home, redesigned filter bar with interactive pill-shaped controls across Home and All Transactions, fixed calendar heatmap stream hydration for past months, and stabilized AboutPage back navigation.
+- **Changes:**
+  - **Home Screen Recent Transactions Section:**
+    - Wrapped Recent Transactions in an elevated upper-squircle container (`borderRadius: BorderRadius.vertical(top: Radius.circular(32))`) with contrasting background (`surfaceContainerLow` / `surfaceContainerHigh`) and drag handle accent.
+    - Placed pill-shaped filter buttons (Date, Account, Type) directly beneath the heading in a horizontal scrollable row.
+    - Integrated "View all" quick text action in the heading and a full-width tonal button at the bottom.
+  - **All Transactions Filter Expansion:**
+    - Added a horizontally scrollable pill filter bar below the AppBar header featuring:
+      - **Date Sort Pill** (`Symbols.calendar_month_rounded`)
+      - **Account Sort Pill** (`Symbols.account_balance_wallet_rounded`)
+      - **Sort Order Toggle Pill** (`Symbols.arrow_upward_rounded` / `Symbols.arrow_downward_rounded`, 'Oldest' vs 'Newest')
+      - **Type Filter Pill** (`All`, `Income`, `Expense`, `Transfer`)
+      - **Archive Toggle Pill** (`Active` vs `Archived`)
+    - Cleaned up redundant AppBar action popups.
+  - **Calendar Heatmap Past Month Stream Fix:**
+    - Switched `ActivityInsightsSection` and `ActivityHeatmapPage` to `allTransactionsStreamProvider` (from 50-limit `transactionsStreamProvider`), allowing historical transactions from all previous months and years to hydrate accurately.
+  - **About Page Navigation Fix:**
+    - Placed `AppBackButton` in standard `AppBar.leading` slot, preventing back arrow shifting when content aligns.
+- **Status:** 100% (All features implemented, static analysis verified with 0 errors).
+
+## [2026-08-27 00:11] - CI/CD Workflow Branch Trigger Expansion
+- **Action:** Expanded branch triggers in GitHub Actions workflows to guarantee automated builds on all sandbox branch naming variations.
+- **Changes:**
+  - Updated `.github/workflows/build_apks.yml` and `.github/workflows/codeql.yml` to trigger on `Improv-Sandbox`, `sandbox/**`, `sandbox/*`, and wildcard sandbox patterns (`*sandbox*`, `*Sandbox*`).
+- **Status:** 100% (Workflows updated and pushed).
+
+## [2026-08-27 01:15] - Expressive Showdown Setting & Showcase Screen
+- **Action:** Added "Expressive Showdown" setting to General Settings replacing Categories, created dedicated Material 3 Expressive showcase screen with native Canvas organic shapes, blueprint grid overlays, concentric circles, and interactive diversification toggle.
+- **Changes:**
+  - **General Settings:** Replaced 'Categories' action tile with 'Expressive Showdown' (`Symbols.auto_awesome_rounded`) and subtitle "Make the experince more expressive" navigating to `/expressive_showdown`.
+  - **Showcase Screen (`ExpressiveShowdownPage`):**
+    - `SliverAppBar.medium` with `AppBackButton` squircle navigation and flexible headline title.
+    - Native `CustomPainter` (`_ExpressiveHeroPainter`) drawing organic blooming geometry (tertiary clover petal, primary 12-point starburst, center scallop), concentric circle grid lines (radii 29 to 166), and blueprint wireframes matching the design reference `Android Compact - 1.svg`.
+    - Floating squircle card badge with wallet/card outline and currency emblem featuring subtle perpetual micro-motion.
+    - Pill squircle switch tile (`height: 72`, `rx: 36`) for 'Expressive Diversification' with haptic feedback and dynamic state binding.
+    - Added Expressive capabilities overview (spring physics, Atelier color harmonies, variable typography) and live design token metrics chips.
+  - **State & Persistence:** Added `isExpressiveDiversificationEnabled` to `PersonalizationState` and `PersonalizationNotifier` with SharedPreferences persistence.
+  - **Navigation & Search:** Added `/expressive_showdown` and `/settings/expressive_showdown` routes in `router.dart`, and updated searchable settings index.
+- **Status:** 100% (Verified with `flutter analyze` with 0 issues).
+
+## [2026-08-28 20:45] - Build Pipeline Stabilization & SDK 36 Subproject Override
+- **Action:** Resolved CI build failure in GitHub Actions Universal APK step by stabilizing Gradle build layout and ensuring all library subprojects compile against SDK 36.
+- **Changes:**
+  - **Gradle Directory Layout:** Fixed `newBuildDir` in `android/build.gradle.kts` to reference `rootProject.layout.projectDirectory.dir("../build")` to avoid lazy property resolution errors in Gradle 8.14.
+  - **Evaluation Guard:** Guarded `project.evaluationDependsOn(":app")` in `subprojects` block so `:app` does not evaluate against itself.
+  - **Subproject SDK 36 Override:** Added `compileSdkVersion(36)` overrides for all `com.android.library` and `com.android.application` subprojects to resolve modern AndroidX dependency constraints in third-party plugins.
+- **Status:** 100% (Toolchain configured and ready for CI validation).
+
+## [2026-09-18 10:20] - Branch Consolidation & Direct APK Downloader Badge Integration
+- **Action:** Consolidated development branch streams across Wallet-Flutter and integrated the direct universal APK download badge into project documentation.
+- **Changes:**
+  - **Branch Merges:**
+    - Committed `assets/images/Direct Link Frame Badge.svg` in `Improv-sandbox` (`sandbox/Improv`).
+    - Merged `sandbox/Improv` into `Improv`.
+    - Merged `Improv` into `main`.
+  - **Documentation & Release Ergonomics:**
+    - Updated `README.md` in `main` under `## 📲 Download Links` with `Direct Link Frame Badge.svg` (`height="100"`, `alt="Direct Downloader Badge"`).
+    - Linked the badge directly to the latest universal production APK release binary: `https://github.com/mrdarksidetm/Wallet-Flutter/releases/latest/download/wallet-universal.apk`.
+- **Status:** 100% (Branches merged in order sandbox -> Improv -> main, README updated).
+
+## [2026-09-18 11:10] - Workflow Job Summary Overhaul & Pass/Fail Badge Architecture
+- **Action:** Upgraded and beautified the GitHub Actions CI/CD job summary in `.github/workflows/build_apks.yml` with centered pass/fail SVG badges, direct release APK downloads, format notifications, and collapsible architectural specifications matching the reference standard.
+- **Changes:**
+  - **Asset Integration:**
+    - Copied `Testing APK Pass.svg` and `Testing APK Fail.svg` into `assets/images/` of `Wallet-Flutter/main`.
+  - **Workflow Job Summary Overhaul (`.github/workflows/build_apks.yml`):**
+    - **Step Summary Decoupling:** Removed premature `$GITHUB_STEP_SUMMARY` logging from `Setup Signing` and `Verify Output APKs`, exporting verification attributes (`SIGNER_OWNER`, `SIGNER_ISSUER`, `SIGNER_SHA256`, `SIGNING_MODE`) into `$GITHUB_ENV` to maintain clean visual ordering.
+    - **Success Summary (`Publish Success to Job Summary`):**
+      - Rendered centered `Testing APK Pass.svg` (`height="100"`) linking directly to the arm64-v8a production APK: `https://github.com/${{ github.repository }}/releases/latest/download/wallet-arm64-v8a.apk`.
+      - Added GitHub Flavored Markdown `> [!NOTE]` alert informing users that Actions Artifacts are packaged in `.zip` archives, and directing them to click the badge or direct links for pure `.apk` binaries.
+      - Provided structured download links for ARM64, Universal APK, GitHub Releases page, Actions artifacts (`Wallet-APKs`), and debug symbols (`Debug-Symbols`).
+      - Added expandable `<details>` blocks for Build & Architecture Specifications, APK Signature & Security Details, and Key Features & Highlights.
+    - **Failure Summary (`Publish Errors to Job Summary`):**
+      - Rendered centered `Testing APK Fail.svg` (`height="100"`) linking directly to the specific workflow run (`${{ github.repository }}/actions/runs/${{ github.run_id }}`).
+      - Added `> [!WARNING]` alert and structured compiler error diagnostics with full build log tail details.
+- **Status:** 100% (Workflow updated, badges staged, ready for push).
+
+## [2026-09-27 12:00:00 IST] - Codeberg Migration & SSH Verified Commit Integration
+- **Action:** Initiated repository migration to Codeberg (`codeberg.org/mrdarksidetm/Wallet-Flutter`), established SSH ED25519 signed commit verification, and mapped Forgejo Actions CI/CD compatibility.
+- **Changes:**
+  - **Remote Architecture:** Configured `codeberg` git remote pointing to `git@codeberg.org:mrdarksidetm/Wallet-Flutter.git`.
+  - **Cryptographic Signing:** Configured verified SSH commit signing using ED25519 key (`id_ed25519_signing`) for Forgejo Verified badge rendering.
+  - **CI/CD Architecture:** Verified Forgejo Actions compatibility with existing `.github/workflows/build_apks.yml` and `.github/workflows/codeql.yml` for automated multi-architecture APK compilation and CodeQL scanning.
+- **Status:** 100% (Migration prepared, remotes configured, cryptographic signing validated).
+
+## [2026-10-01 12:37:30 IST] - GitHub junksidetm Setup & Tri-Platform Multi-Push Remote
+- **Action**: Created new GitHub repository under `junksidetm/Wallet-Flutter` and configured simultaneous multi-push synchronization across GitHub, GitLab, and Codeberg.
+- **Changes**:
+  - **Remote Architecture:** Configured `origin` remote to push concurrently to GitHub (`https://github.com/junksidetm/Wallet-Flutter.git`), GitLab (`git@gitlab.com:mrdarksidetm/Wallet-Flutter.git`), and Codeberg (`git@codeberg.org:mrdarksidetm/Wallet-Flutter.git`).
+  - **Credential & Identity Mapping:** Automated conditional Git identity (`.gitconfig-github`) utilizing `junksidetm` for GitHub while maintaining `mrdarksidetm` for GitLab and Codeberg.
+  - **Branch Synchronization:** Pushed `main` and `Improv` branches and all tags to `junksidetm/Wallet-Flutter`.
+- **Status:** 100% (GitHub repository created, multi-push remote active, and branches synchronized across all 3 platforms).
+
+## [2026-10-01 12:47:00 IST] - README Documentation GitHub Links Migration
+- **Action**: Updated README.md documentation links, badges, and author references to point to active GitHub account `junksidetm` while preserving GitLab and Codeberg mappings.
+- **Files Modified**:
+  - `README.md`
+  - `Version.md`
+- **Status**: 100% (Completed & Synced)
+
+## [2026-10-08 18:13:30 IST] - Tri-Platform Source Mirrors Integration
+- **Action**: Added GitHub (Main), Codeberg (Mirror), and GitLab (Mirror) repository badges and dedicated Source Mirrors section in README.md.
+- **Files Modified**:
+  - `README.md`
+  - `Version.md`
+- **Status**: 100% (Completed & Synced)
+
+## [2026-10-09 22:05:00 IST] - Production GitHub Release Pipeline & Direct Download Badge Resolution
+- **Action**: Enabled automated GitHub Releases publishing in CI workflow for production APKs and wired direct APK download badge in README.md.
+- **Components Modified**:
+  - `.github/workflows/build_apks.yml`: Added repository write permissions, checksum generation, and automated GitHub Releases job publishing all architecture-specific and universal APKs.
+  - `README.md`: Connected Direct Link Frame badge href to direct GitHub release asset endpoint.
+  - `Version.md`: Appended tracking entry.
+- **Status**: 100% (Completed)
+
+## [2026-10-09 22:15:00 IST] - Hub Ecosystem URL Migration
+- **Action**: Migrated ecosystem and Forge Hub navigation links from `mrdarksidetm.github.io` to `junksidetm.github.io`.
+- **Files Modified**:
+  - `docs/index.html`: Updated Ecosystem navbar link and Forge Hub footer link.
+  - `Version.md`: Appended ledger entry.
+- **Status**: 100% (Completed)
+
+## [2026-10-09 23:12:00 IST] - Automated GitHub Pages Deployment Pipeline
+- **Action**: Established automated GitHub Pages deployment workflow deploying `docs/` showcase on `main` branch push.
+- **Files Added**:
+  - `.github/workflows/pages.yml`
+- **Files Modified**:
+  - `Version.md`: Appended tracking entry.
+- **Status**: 100% (Completed)
+
+## [2026-10-10 15:15:00 IST] - Documentation & Codeium Ecosystem Branding
+- **Action**: Added official Codeium / Darkside Studio ecosystem footer and banner to README.md.
+- **Files Modified**:
+  - `README.md`
+  - `Version.md`
+- **Status**: 100% (Completed & Synced)

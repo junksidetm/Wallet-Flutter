@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Dependabot configuration for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Dependabot configuration for Flutter / Dart (pub)
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      dependencies:
+        patterns:
+          - "*"

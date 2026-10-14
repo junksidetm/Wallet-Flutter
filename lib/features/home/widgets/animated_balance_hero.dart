@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/database/providers.dart';
 import '../../../core/theme/personalization_provider.dart';
 import '../../../core/services/currency_engine.dart';
+import '../../../core/widgets/expressive_shape.dart';
 
 class AnimatedBalanceHero extends ConsumerStatefulWidget {
   final double totalBalance;
@@ -42,6 +43,25 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
     super.dispose();
   }
 
+  List<FontVariation> _getBalanceFontVariations(double amount) {
+    final intVal = amount.abs().truncate();
+    final digits = intVal == 0 ? 1 : intVal.toString().length;
+    final double t = ((digits - 4) / (12 - 4)).clamp(0.0, 1.0);
+    final double weight = 797.0 - (t * (797.0 - 100.0));
+    final double width = 131.0 - (t * (131.0 - 50.0));
+    const double grade = 59.0;
+    const double roundness = 42.0;
+    const double opticalSize = 86.0;
+
+    return [
+      const FontVariation('GRAD', grade),
+      FontVariation('wght', weight),
+      FontVariation('wdth', width),
+      const FontVariation('ROND', roundness),
+      const FontVariation('opsz', opticalSize),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -50,10 +70,10 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
     final isVisible = ref.watch(personalizationProvider.select((p) => p.isBalanceVisible));
     final currency = ref.watch(currencyProvider);
 
-    // Using colors from current theme to maintain consistency while achieving the 'vibrant' look
-    final blob1Color = isDark ? colorScheme.primary.withValues(alpha: 0.4) : const Color(0xFFD4BFE8);
-    final blob2Color = isDark ? colorScheme.secondary.withValues(alpha: 0.4) : const Color(0xFFE5CCF4);
-    final baseColor = isDark ? colorScheme.surfaceContainer : const Color(0xFFF3EDF7);
+    // Using dynamic theme seed colors to maintain full harmony in expressive mode
+    final blob1Color = colorScheme.primary.withValues(alpha: isDark ? 0.35 : 0.22);
+    final blob2Color = colorScheme.tertiary.withValues(alpha: isDark ? 0.30 : 0.18);
+    final baseColor = isDark ? colorScheme.surfaceContainer : colorScheme.surfaceContainerHigh;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
@@ -175,28 +195,32 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
 
                   // Rolling Balance Text
                   if (isVisible)
-                    TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: widget.totalBalance),
-                      duration: const Duration(milliseconds: 1500),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) {
-                        return Text(
-                          CurrencyEngine.formatCurrency(value, currency),
-                          style: theme.textTheme.displayMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: colorScheme.onSurface,
-                            letterSpacing: -1,
-                          ),
-                        );
-                      },
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0, end: widget.totalBalance),
+                        duration: const Duration(milliseconds: 1500),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, child) {
+                          return Text(
+                            CurrencyEngine.formatCurrency(value, currency),
+                            style: theme.textTheme.displayMedium?.copyWith(
+                              fontFamily: 'GoogleSansFlex',
+                              fontVariations: _getBalanceFontVariations(widget.totalBalance),
+                              color: colorScheme.onSurface,
+                              letterSpacing: -1,
+                            ),
+                          );
+                        },
+                      ),
                     )
                   else
-                    Text(
-                      '••••••',
-                      style: theme.textTheme.displayMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ExpressiveObscuredBalance(
+                        dotSize: 26,
                         color: colorScheme.onSurface,
-                        letterSpacing: 4,
                       ),
                     ),
                   
@@ -229,10 +253,12 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                         child: _buildMiniStat(
                           'Income', 
                           widget.monthlyIncome, 
-                          Colors.green, 
+                          const Color(0xFF10B981), 
                           isVisible, 
                           currency,
                           Symbols.trending_up,
+                          colorScheme,
+                          isDark,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -240,10 +266,12 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                         child: _buildMiniStat(
                           'Expense', 
                           widget.monthlyExpense, 
-                          Colors.red, 
+                          const Color(0xFFEF4444), 
                           isVisible, 
                           currency,
                           Symbols.trending_down,
+                          colorScheme,
+                          isDark,
                         ),
                       ),
                     ],
@@ -257,7 +285,7 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                         backgroundColor: colorScheme.onSurface.withValues(alpha: 0.05),
                         valueColor: AlwaysStoppedAnimation<Color>(
                           (widget.monthlyExpense / widget.monthlyIncome) > 0.9 
-                              ? Colors.red 
+                              ? const Color(0xFFEF4444) 
                               : colorScheme.primary,
                         ),
                         minHeight: 6,
@@ -280,19 +308,25 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
     bool isVisible, 
     String currency,
     IconData icon,
+    ColorScheme colorScheme,
+    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.05),
+        color: isDark ? colorScheme.surface.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withValues(alpha: 0.18),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 14),
@@ -305,7 +339,7 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                 Text(
                   label,
                   style: TextStyle(
-                    color: Colors.grey.shade600, 
+                    color: colorScheme.onSurfaceVariant, 
                     fontSize: 10, 
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -318,7 +352,7 @@ class _AnimatedBalanceHeroState extends ConsumerState<AnimatedBalanceHero>
                     isVisible ? CurrencyEngine.formatCurrency(amount, currency) : '•••',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: color.withValues(alpha: 0.8),
+                      color: color.withValues(alpha: 0.9),
                       fontSize: 14,
                     ),
                   ),
