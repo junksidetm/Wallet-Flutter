@@ -505,3 +505,8 @@ ont_awesome_flutter\ v11 APIs.
 - **Files Modified**: `.github/workflows/build_apks.yml`, `pubspec.yaml`, `docs/index.html`, `lib/main.dart`, `lib/core/database/isar_service.dart`, `lib/core/services/update_service.dart`, `lib/core/widgets/wallet_carousel.dart`, `lib/features/accounts/pages/accounts_page.dart`, `lib/features/home/pages/home_page.dart`, `lib/features/settings/pages/about_page.dart`, `lib/features/settings/pages/settings_page.dart`, 21 files for tooltips, `Version.md`
 - **Files Added**: `IMPROVEMENT_PLAN.md`, `release-notes/v5.1.2.md`
 - **Status**: 100% (Committed on Improv; release pending CI and merge to main)
+
+## [2026-10-14 11:05:00 IST] - v5.1.2 Released
+- **Action**: Merged `Improv` into `main` (2783a6a). CI built signed APKs and published release `v5.1.2` (Latest) with notes from `release-notes/v5.1.2.md`. Corrected the size line in the notes to the measured result (arm64 APK 88 → 73 MB).
+- **Files Modified**: `release-notes/v5.1.2.md`, `Version.md`
+- **Status**: 100% (Released on GitHub; GitLab/Codeberg mirror sync pending owner approval)
