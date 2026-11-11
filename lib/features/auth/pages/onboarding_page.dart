@@ -890,6 +890,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
               child: FilledButton(
                 onPressed: () {},
                 onLongPress: () {},
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 3,
+                ),
                 child: InkWell(
                   onTapUp: (details) => _startRippleAnimation(details, isRestart: true),
                   child: const Center(
@@ -902,14 +910,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                       ),
                     ),
                   ),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 3,
                 ),
               ),
             ),
@@ -2125,6 +2125,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
               child: FilledButton(
                 onPressed: () {},
                 onLongPress: () {},
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 3,
+                ),
                 child: InkWell(
                   onTapUp: (details) => _startRippleAnimation(details),
                   child: const Center(
@@ -2137,14 +2145,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                       ),
                     ),
                   ),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 3,
                 ),
               ),
             ),

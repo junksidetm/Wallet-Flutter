@@ -298,7 +298,7 @@ class _LoansPageState extends ConsumerState<LoansPage> {
     final personName = item.person.value?.name ?? 'Unknown Contact';
     final isLent = item.type == LoanType.lent;
 
-    final Color paidColor = const Color(0xFF10B981);
+    const Color paidColor = Color(0xFF10B981);
     final Color remainingColor =
         isLent ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
 

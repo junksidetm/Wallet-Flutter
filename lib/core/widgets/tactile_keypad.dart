@@ -21,9 +21,9 @@ class TactileKeypad extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Calculate button size based on available width
-        final double spacing = 12.0;
+        const double spacing = 12.0;
         final double btnWidth = (constraints.maxWidth - (spacing * 2)) / 3;
-        final double btnHeight = 64.0;
+        const double btnHeight = 64.0;
 
         Widget buildKey(String value, {Widget? icon, Color? color, Color? iconColor}) {
           final theme = Theme.of(context);

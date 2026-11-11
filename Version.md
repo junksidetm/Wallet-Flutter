@@ -1785,3 +1785,28 @@ ont_awesome_flutter\ v11 APIs.
     - `wallet-arm-v7a.apk` (32-bit ARMv7a) & `.sha256`
     - `wallet-x86_64.apk` (64-bit x86 architecture) & `.sha256`
 - **Status**: 100% (Completed & Published Live)
+
+
+## [2026-11-11 12:20:00 IST] - Consolidation of Pull Requests #6 and #4 & Codebase Robustness Fixes
+- **Action**: Merged PR #6 (Responsive Material 3 Expressive Onboarding Overhaul) and PR #4 (GitHub Actions Toolchain Upgrades) into `Improv`, and applied surgical robustness and static typing fixes across the codebase.
+- **Pull Requests Integrated**:
+  - **PR #6 (`gojoyadav:fix/onboarding-m3-expressive-redesign`)**: Overhauled 8-screen onboarding flow, eliminated wireframe coordinate collisions (`_pos`), replaced mock placeholders with Material 3 Expressive components, normalized vector shapes (`shape_bun.svg`, `onboarding_currency_icon.svg`, `onboarding_colour_icon.svg`), and enforced progression gating with `NeverScrollableScrollPhysics` and `PopScope`.
+  - **PR #4 (`dependabot:github_actions/github-actions-b828bd48ad`)**: Upgraded GitHub Actions runners across workflows (`build_apks.yml`, `codeql.yml`, `pages.yml`) including `actions/checkout@v7`, `actions/setup-java@v6`, `actions/upload-artifact@v7`, `softprops/action-gh-release@v3`, `github/codeql-action@v4`, `actions/configure-pages@v6`, `actions/upload-pages-artifact@v5`, and `actions/deploy-pages@v5`.
+  - **PR #5 Evaluation**: Assessed PR #5 (31 dependency bumps); retained stable community vendor configurations for `isar` and `isar_flutter_libs` to prevent breaking changes with upstream schema and native ABI bindings.
+- **Surgical Codebase Fixes**:
+  - `lib/features/auth/pages/legacy_onboarding_page.dart`: Corrected constructor identifier and ConsumerState generic arguments from `OnboardingPage` to `LegacyOnboardingPage`.
+  - `lib/features/transactions/pages/add_transaction_page.dart`: Removed redundant `dart:ui` and unused `expressive_shape.dart` imports; marked local `pickerColor` as `final`.
+  - `lib/core/widgets/tactile_keypad.dart`: Replaced `final` with `const` for compile-time layout constants (`spacing` and `btnHeight`).
+  - `lib/features/loans/pages/loans_page.dart`: Converted `paidColor` to a compile-time `const`.
+  - `lib/features/auth/pages/onboarding_page.dart`: Reordered `FilledButton` constructor arguments to place `style:` before `child:` for lint compliance.
+- **Files Modified**:
+  - `.github/workflows/build_apks.yml`
+  - `.github/workflows/codeql.yml`
+  - `.github/workflows/pages.yml`
+  - `lib/core/widgets/tactile_keypad.dart`
+  - `lib/features/auth/pages/legacy_onboarding_page.dart`
+  - `lib/features/auth/pages/onboarding_page.dart`
+  - `lib/features/loans/pages/loans_page.dart`
+  - `lib/features/transactions/pages/add_transaction_page.dart`
+  - `Version.md`
+- **Status**: 100% (Completed & Ready for Remote CI/CD Verification)

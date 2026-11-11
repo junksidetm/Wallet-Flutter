@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +16,6 @@ import '../../../core/widgets/primary_atelier_button.dart';
 import '../../../core/theme/color_extension.dart';
 import '../../../core/database/models/auxiliary_models.dart';
 import '../../../core/widgets/expressive_bottom_sheet.dart';
-import '../../../core/widgets/expressive_shape.dart';
 import '../../../core/services/currency_engine.dart';
 import '../../../core/widgets/app_back_button.dart';
 import '../../people/widgets/person_avatar.dart';
@@ -1427,7 +1425,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   }
 
   Future<void> _pickColor() async {
-    Color pickerColor = _selectedColor != null
+    final Color pickerColor = _selectedColor != null
         ? _selectedColor!.parseHexColor()
         : _selectedCategory?.color.parseHexColor() ?? Colors.blue;
 

@@ -15,13 +15,13 @@ import '../../../core/services/file_service.dart';
 import '../../../core/database/providers.dart';
 
 class LegacyOnboardingPage extends ConsumerStatefulWidget {
-  const OnboardingPage({super.key});
+  const LegacyOnboardingPage({super.key});
 
   @override
-  ConsumerState<OnboardingPage> createState() => _LegacyOnboardingPageState();
+  ConsumerState<LegacyOnboardingPage> createState() => _LegacyOnboardingPageState();
 }
 
-class _LegacyOnboardingPageState extends ConsumerState<OnboardingPage> with SingleTickerProviderStateMixin {
+class _LegacyOnboardingPageState extends ConsumerState<LegacyOnboardingPage> with SingleTickerProviderStateMixin {
   late PageController _pageController;
   double _currentPage = 0;
 
