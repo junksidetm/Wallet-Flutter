@@ -1939,3 +1939,15 @@ ont_awesome_flutter\ v11 APIs.
   - `lib/features/auth/pages/onboarding_page.dart`
   - `Version.md`
 - **Status**: 100% (Completed & Verified)
+
+
+## [2026-11-23 18:18:00 IST] - Published Pre-Release v6.0.0-dev15 (Build #53)
+- **Tag**: `v6.0.0-dev15` (Pre-release)
+- **Workflow**: `Build Wallet APKs` (Run #45176996328, Commit `edc23c5`)
+- **Published Deliverables**:
+  - `wallet-arm64-v8a.apk` (64-bit ARM architecture) & `.sha256`
+  - `wallet-arm-v7a.apk` (32-bit ARMv7a) & `.sha256`
+  - `wallet-x86_64.apk` (64-bit x86 architecture) & `.sha256`
+  - `wallet-universal.apk` (Fat universal binary) & `.sha256`
+- **Verification**: Verified production-signed binaries, exact 0.0px cohesive centering on Screen 8, and verified GitHub release portal live.
+- **Status**: 100% (Completed & Published Live)
