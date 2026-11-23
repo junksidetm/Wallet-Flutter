@@ -1832,3 +1832,16 @@ ont_awesome_flutter\ v11 APIs.
   - `lib/features/auth/pages/onboarding_page.dart`
   - `Version.md`
 - **Status**: 100% (Completed & Verified)
+
+
+## [2026-11-23 15:45:00 IST] - CI Stability Gating: Pin Flutter 3.47.9 Production Toolchain Baseline
+- **Root Cause Analysis**:
+  - The unpinned `channel: 'stable'` specification in CI runners auto-resolved to Flutter 3.50.1.
+  - Flutter 3.50.1 introduced a binary incompatibility with AGP 8.11 DSL evaluation during subproject dependency resolution (`NoSuchMethodError: ApplicationExtension.getDefaultConfig()`).
+- **Remediation**:
+  - Strictly pinned `flutter-version: '3.47.9'` across all CI workflows (`build_apks.yml` and `codeql.yml`) in adherence to the anti-fragile stability gating mandate in `GEMINI.md`.
+- **Files Modified**:
+  - `.github/workflows/build_apks.yml`
+  - `.github/workflows/codeql.yml`
+  - `Version.md`
+- **Status**: 100% (Completed & Verified)
