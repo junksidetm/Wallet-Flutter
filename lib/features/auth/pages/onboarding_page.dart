@@ -404,6 +404,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     double sunnyCenterX;
     double sunnyCenterY;
     double sunnySize;
+    double sunnyOpacity = 1.0;
 
     if (_currentPage <= 1.0) {
       sunnyCenterX = lerpDouble(333.0, 339.0, p01)!;
@@ -414,12 +415,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       sunnyCenterY = 93.0;
       sunnySize = 287.3;
     } else {
-
-    double sunnyOpacity = 1.0;
-    if (_currentPage > 6.0) {
-      // Cross-fade ambient sunny smoothly into Screen 8's cohesive Top Middle Section
       sunnyOpacity = lerpDouble(1.0, 0.0, p67)!.clamp(0.0, 1.0);
-    }
+
       sunnyCenterX = lerpDouble(339.0, 206.0, p67)!;
       sunnyCenterY = lerpDouble(93.0, 228.0, p67)!;
       sunnySize = lerpDouble(287.3, 376.4, p67)!;
@@ -429,6 +426,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       sunnyCenterX = 339.0;
       sunnyCenterY = 93.0;
       sunnySize = 287.3;
+      sunnyOpacity = 1.0;
     }
 
     // 2. BUN - MOVE:

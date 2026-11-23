@@ -1845,3 +1845,14 @@ ont_awesome_flutter\ v11 APIs.
   - `.github/workflows/codeql.yml`
   - `Version.md`
 - **Status**: 100% (Completed & Verified)
+
+
+## [2026-11-23 15:58:00 IST] - Compilation Fix: Scope sunnyOpacity at Method Level in Ambient Shapes
+- **Action**: Corrected variable scope of `sunnyOpacity` in `_buildAmbientBackgroundShapes`.
+- **Details**:
+  - Hoisted `double sunnyOpacity = 1.0;` to the method signature declaration scope alongside `sunnyCenterX`, `sunnyCenterY`, and `sunnySize`.
+  - Resolved Flutter compiler error `getter 'sunnyOpacity' isn't defined for the type '_OnboardingPageState'`.
+- **Files Modified**:
+  - `lib/features/auth/pages/onboarding_page.dart`
+  - `Version.md`
+- **Status**: 100% (Completed & Verified)
