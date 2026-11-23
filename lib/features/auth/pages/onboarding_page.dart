@@ -286,7 +286,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             // --------------------------------------------------------------------
             // AMBIENT ROTATING BACKGROUND SHAPES (SUNNY, BUN, SOFT BOOM)
             // --------------------------------------------------------------------
-            _buildAmbientBackgroundShapes(size, moveShapeColor),
+            _buildAmbientBackgroundShapes(size, moveShapeColor, colorScheme, isDynamicColor),
 
             // --------------------------------------------------------------------
             // MAIN PAGE FLOW (OR ALTERNATE BACKUP COMPLETE VIEW)
@@ -305,7 +305,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   _buildScreen5(theme, colorScheme),
                   _buildScreen6(theme, colorScheme),
                   _buildScreen7(theme, colorScheme),
-                  _buildScreen8(theme, colorScheme),
+                  _buildScreen8(theme, colorScheme, isDynamicColor),
                 ],
               ),
 
@@ -339,9 +339,61 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   }
 
   // ============================================================================
+  // DYNAMIC THEMING & SHAPE COLOR HELPERS
+  // ============================================================================
+  Color _getSunnyColor(ColorScheme colorScheme, bool isDynamic, double progress) {
+    if (!isDynamic) {
+      // Signature static purple theme color matching wireframe #6750A4
+      return const Color(0xFF6750A4).withValues(alpha: 0.50);
+    }
+    // When dynamic mode is enabled, smoothly transition across the dynamic color spectrum
+    // Primary -> Tertiary -> Secondary -> PrimaryContainer -> Primary
+    final colors = [
+      colorScheme.primary.withValues(alpha: 0.50),
+      colorScheme.tertiary.withValues(alpha: 0.50),
+      colorScheme.secondary.withValues(alpha: 0.50),
+      colorScheme.primaryContainer.withValues(alpha: 0.65),
+      colorScheme.primary.withValues(alpha: 0.50),
+    ];
+    final norm = progress.clamp(0.0, 1.0);
+    final segment = 1.0 / (colors.length - 1);
+    final index = (norm / segment).floor().clamp(0, colors.length - 2);
+    final t = (norm - (index * segment)) / segment;
+    return Color.lerp(colors[index], colors[index + 1], t)!;
+  }
+
+  Widget _buildDynamicNameIcon(ColorScheme colorScheme, {double height = 155}) {
+    // Exact SVG structure and IDs from WireFrame - Onboarding 4
+    // Replaces wireframe #D9D9D9 container and black foreground with dynamic theme colors
+    final containerHex = '#${(colorScheme.surfaceContainerHighest.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+    final fgHex = '#${(colorScheme.onSurface.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+
+    final svgString = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 110 382 205" fill="none">
+<g id="Name - icon">
+<rect id="Rectangle 1" x="24" y="113" width="374.659" height="198" rx="47.4252" fill="$containerHex" fill-opacity="0.68"/>
+<g id="Photo - Icon">
+<path d="M118.85 166.387C135.294 166.387 148.639 179.733 148.639 196.177C148.56 212.302 135.929 225.33 119.883 225.886H118.453C101.692 225.409 89.0613 212.302 89.0613 196.177C89.0613 179.733 102.407 166.387 118.85 166.387Z" fill="$fgHex"/>
+<path d="M118.85 127.228C162.62 127.228 198.287 162.895 198.287 206.665C198.287 229.701 188.358 250.435 172.55 264.972C172.629 265.051 172.629 265.051 172.629 265.13C171.835 265.845 170.961 266.56 170.087 267.275C169.611 267.593 169.213 267.99 168.737 268.387C167.307 269.579 165.798 270.691 164.209 271.803C163.653 272.2 163.176 272.598 162.62 272.915C161.031 273.948 159.443 274.822 157.854 275.775C157.298 276.093 156.742 276.49 156.106 276.808C154.438 277.681 152.77 278.476 151.102 279.191C150.466 279.509 149.831 279.826 149.195 280.065C147.527 280.78 145.7 281.336 143.952 281.971C143.317 282.13 142.681 282.368 142.046 282.607C140.219 283.242 138.233 283.639 136.326 284.116C135.691 284.195 135.135 284.434 134.579 284.513C132.355 284.99 130.13 285.308 127.827 285.546C127.509 285.625 127.191 285.705 126.873 285.705C124.252 285.943 121.551 286.102 118.85 286.102C116.149 286.102 113.448 285.943 110.748 285.705C110.43 285.625 110.112 285.546 109.794 285.546C107.491 285.308 105.267 284.99 103.042 284.513C102.407 284.434 101.851 284.275 101.295 284.116C99.3881 283.639 97.4815 283.163 95.575 282.607C94.9396 282.448 94.304 282.209 93.6685 281.971C91.921 281.415 90.1733 280.78 88.4257 280.065C87.7902 279.826 87.1547 279.509 86.5192 279.191C84.7716 278.476 83.1034 277.681 81.5146 276.808C80.9586 276.49 80.3231 276.093 79.7671 275.775C78.0989 274.901 76.5102 273.948 75.0009 272.915C74.4448 272.518 73.9681 272.2 73.4121 271.803C71.9028 270.691 70.314 269.579 68.8841 268.387C68.4075 268.07 68.0105 267.672 67.5339 267.275C66.7395 266.56 65.7862 265.925 64.9918 265.13C65.0712 265.051 65.0711 265.051 65.0711 264.972C49.3426 250.435 39.4131 229.701 39.4131 206.665C39.4131 162.895 75.0803 127.228 118.85 127.228ZM118.85 139.143C81.5942 139.143 51.3287 169.409 51.3287 206.665C51.3287 225.094 58.7958 241.855 70.8702 254.089C73.2533 251.15 76.113 248.449 79.6082 246.145C101.295 231.687 136.565 231.687 158.092 246.145C161.587 248.449 164.527 251.15 166.83 254.089C178.905 241.855 186.372 225.094 186.372 206.665C186.372 169.409 156.106 139.143 118.85 139.143Z" fill-rule="evenodd" clip-rule="evenodd" fill="$fgHex"/>
+</g>
+<g id="Lines">
+<line id="Line 1" x1="219.629" y1="165.168" x2="360.718" y2="165.168" stroke-width="14.2275" stroke-linecap="round" stroke="$fgHex"/>
+<line id="Line 2" x1="219.629" y1="207.85" x2="360.718" y2="207.85" stroke-width="14.2275" stroke-linecap="round" stroke="$fgHex"/>
+<line id="Line 3" x1="219.629" y1="244.605" x2="360.718" y2="244.605" stroke-width="14.2275" stroke-linecap="round" stroke="$fgHex"/>
+</g>
+</g>
+</svg>''';
+
+    return SvgPicture.string(
+      svgString,
+      height: height,
+      fit: BoxFit.contain,
+    );
+  }
+
+  // ============================================================================
   // AMBIENT ROTATING BACKGROUND SHAPES
   // ============================================================================
-  Widget _buildAmbientBackgroundShapes(Size size, Color shapeColor) {
+  Widget _buildAmbientBackgroundShapes(Size size, Color shapeColor, ColorScheme colorScheme, bool isDynamicColor) {
     final sx = size.width / 412.0;
     final sy = size.height / 917.0;
 
@@ -362,6 +414,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       sunnyCenterY = 93.0;
       sunnySize = 287.3;
     } else {
+
+    double sunnyOpacity = 1.0;
+    if (_currentPage > 6.0) {
+      // Cross-fade ambient sunny smoothly into Screen 8's cohesive Top Middle Section
+      sunnyOpacity = lerpDouble(1.0, 0.0, p67)!.clamp(0.0, 1.0);
+    }
       sunnyCenterX = lerpDouble(339.0, 206.0, p67)!;
       sunnyCenterY = lerpDouble(93.0, 228.0, p67)!;
       sunnySize = lerpDouble(287.3, 376.4, p67)!;
@@ -463,26 +521,34 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             ),
 
           // Sunny shape (top-right or behind wallet)
-          Positioned(
-            left: sunnyCenterX * sx - (sunnySize * sx) / 2,
-            top: sunnyCenterY * sy - (sunnySize * sy) / 2,
-            width: sunnySize * sx,
-            height: sunnySize * sy,
-            child: AnimatedBuilder(
-              animation: _ambientRotationController,
-              builder: (context, child) {
-                return Transform.rotate(
-                  angle: _ambientRotationController.value * 2 * math.pi,
-                  child: child,
-                );
-              },
-              child: SvgPicture.asset(
-                'assets/images/shape_sunny.svg',
-                fit: BoxFit.contain,
-                colorFilter: ColorFilter.mode(shapeColor, BlendMode.srcIn),
+          if (sunnyOpacity > 0.01)
+            Positioned(
+              left: sunnyCenterX * sx - (sunnySize * sx) / 2,
+              top: sunnyCenterY * sy - (sunnySize * sy) / 2,
+              width: sunnySize * sx,
+              height: sunnySize * sy,
+              child: Opacity(
+                opacity: sunnyOpacity,
+                child: AnimatedBuilder(
+                  animation: _ambientRotationController,
+                  builder: (context, child) {
+                    final dynamicSunnyColor = _getSunnyColor(
+                      colorScheme,
+                      isDynamicColor,
+                      _ambientRotationController.value,
+                    );
+                    return Transform.rotate(
+                      angle: _ambientRotationController.value * 2 * math.pi,
+                      child: SvgPicture.asset(
+                        'assets/images/shape_sunny.svg',
+                        fit: BoxFit.contain,
+                        colorFilter: ColorFilter.mode(dynamicSunnyColor, BlendMode.srcIn),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
 
           // Bun shape (left edge)
           if (bunOpacity > 0.01)
@@ -1087,93 +1153,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           children: [
             const Spacer(flex: 1),
 
-            // Hero ID Badge Card (Colorful & Dynamic Material 3 Expressive)
-            Container(
-              width: 300,
-              height: 145,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    colorScheme.primaryContainer.withValues(alpha: 0.9),
-                    colorScheme.secondaryContainer.withValues(alpha: 0.75),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(
-                  color: colorScheme.primary.withValues(alpha: 0.35),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.18),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorScheme.primary.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Symbols.person_rounded,
-                      size: 46,
-                      color: colorScheme.onPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 14,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary.withValues(alpha: 0.8),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          height: 10,
-                          width: 85,
-                          decoration: BoxDecoration(
-                            color: colorScheme.secondary.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          height: 8,
-                          width: 55,
-                          decoration: BoxDecoration(
-                            color: colorScheme.tertiary.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Hero ID Badge Card (Exact SVG structure from WireFrame - Onboarding 4 with dynamic theme colors)
+            _buildDynamicNameIcon(colorScheme),
             const SizedBox(height: 28),
 
             // Headline Text
@@ -2062,13 +2043,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   // ============================================================================
   // SCREEN 8: YOU'RE ALL SET (LET'S DIVE IN)
   // ============================================================================
-  Widget _buildScreen8(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildScreen8(ThemeData theme, ColorScheme colorScheme, bool isDynamicColor) {
     return SafeArea(
+      // Section 1: System Overlay - adapts accordingly to phone notification space above & nav bar below
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Column(
           children: [
-            // Top Bar with Open Source Initiative Badge
+            // Section 2: Top section - just below system overlay, houses the "Open source logo"
             Align(
               alignment: Alignment.centerRight,
               child: SvgPicture.asset(
@@ -2080,58 +2062,96 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             ),
             const Spacer(flex: 1),
 
-            // Center Brand Logo
-            SvgPicture.asset(
-              'assets/images/logo.svg',
-              width: 150,
-              height: 110,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 28),
+            // Section 3: Top middle section - cohesive Sunny - Move and Wallet - Logo
+            // Sunny move rotates on its axis and transitions colors if dynamic mode is enabled
+            // Wallet logo sits centered right in front of Sunny, keeping their positions cohesive
+            Center(
+              child: SizedBox(
+                width: 280,
+                height: 280,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Sunny - Move: Rotating on its axis with dynamic color transitions
+                    AnimatedBuilder(
+                      animation: _ambientRotationController,
+                      builder: (context, child) {
+                        final sunnyColor = _getSunnyColor(
+                          colorScheme,
+                          isDynamicColor,
+                          _ambientRotationController.value,
+                        );
+                        return Transform.rotate(
+                          angle: _ambientRotationController.value * 2 * math.pi,
+                          child: SvgPicture.asset(
+                            'assets/images/shape_sunny.svg',
+                            width: 280,
+                            height: 280,
+                            fit: BoxFit.contain,
+                            colorFilter: ColorFilter.mode(sunnyColor, BlendMode.srcIn),
+                          ),
+                        );
+                      },
+                    ),
 
-            // Headline Text: "You’re all set"
-            Text(
-              'You’re all set',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-                fontFamily: 'GoogleSansFlex',
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Subtitle Privacy Declaration Body (Exact as SVG Wireframe 8)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'Wallet is fully open source and works offline. Your data never leaves your device.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.onSurfaceVariant,
-                  fontFamily: 'GoogleSansFlex',
-                  height: 1.5,
+                    // Wallet - Logo: Centered and cohesive with Sunny - Move
+                    SvgPicture.asset(
+                      'assets/images/logo.svg',
+                      width: 175,
+                      height: 130,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
                 ),
               ),
             ),
+            const Spacer(flex: 1),
+
+            // Section 4: Middle section - houses the text
+            Column(
+              children: [
+                Text(
+                  'You’re all set',
+                  style: TextStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                    fontFamily: 'GoogleSansFlex',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Wallet is fully open source and works offline. Your data never leaves your device',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurfaceVariant,
+                      fontFamily: 'GoogleSansFlex',
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const Spacer(flex: 2),
 
-            // Bottom Action Button: "Let’s Dive in"
+            // Section 5: Bottom section - houses the button
+            // Replaces wireframe #D9D9D9 container with dynamic theme color
             SizedBox(
               width: double.infinity,
-              height: 62,
+              height: 64,
               child: FilledButton(
                 onPressed: () {},
-                onLongPress: () {},
                 style: FilledButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  elevation: 3,
+                  elevation: 2,
                 ),
                 child: InkWell(
                   onTapUp: (details) => _startRippleAnimation(details),

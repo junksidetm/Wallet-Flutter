@@ -1810,3 +1810,25 @@ ont_awesome_flutter\ v11 APIs.
   - `lib/features/transactions/pages/add_transaction_page.dart`
   - `Version.md`
 - **Status**: 100% (Completed & Ready for Remote CI/CD Verification)
+
+
+## [2026-11-23 14:45:00 IST] - Onboarding 8 & 4 Wireframe Alignment, Dynamic Theming & Sunny Color Transitions
+- **Action**: Upgraded Onboarding Screen 8 and Screen 4 to strictly match wireframe structural specifications and dynamic theming mandates.
+- **Onboarding Screen 8 Refinement (5 Cohesive Sections)**:
+  - **Section 1 (System Overlay)**: Handled dynamically via `SafeArea`, ensuring edge-to-edge system bar responsiveness (status bar notification headroom and bottom navigation bar padding).
+  - **Section 2 (Top Section)**: Positioned the official Open Source Initiative logo badge (`assets/images/open-source.svg`) aligned top-right just below the system overlay.
+  - **Section 3 (Top Middle Section - Cohesive Sunny & Logo)**: Grouped `Sunny - Move` and `Wallet - Logo` into a unified, centered, cohesive container stack ($280\times 280\text{dp}$). `Sunny - Move` perpetually rotates on its axis via `_ambientRotationController` and dynamically transitions smoothly across the theme color spectrum (`primary` $\to$ `tertiary` $\to$ `secondary` $\to$ `primaryContainer` $\to$ `primary`) when dynamic mode (`useMaterialYou`) is enabled. The Wallet Logo remains centered directly on top of the rotating Sunny, guaranteeing zero spatial drift across screen aspect ratios.
+  - **Section 4 (Middle Section - Privacy Text)**: Centered display headline "You’re all set" paired with the exact wireframe declaration body: "Wallet is fully open source and works offline. Your data never leaves your device".
+  - **Section 5 (Bottom Section - Action Button)**: Replaced wireframe `#D9D9D9` container color with dynamic theme `colorScheme.primary` and `colorScheme.onPrimary` foreground for the "Let’s Dive in" launch button, triggering `_startRippleAnimation` on tap.
+- **Onboarding Screen 4 Refinement (Wireframe Exact Name Icon)**:
+  - Preserved exact wireframe SVG structure and element IDs (`id="Name - icon"`, `Rectangle 1`, `Photo - Icon`, `Lines`) via `_buildDynamicNameIcon()`.
+  - Dynamically replaced wireframe `#D9D9D9` with `colorScheme.surfaceContainerHighest.withOpacity(0.68)` and black silhouettes/lines with `colorScheme.onSurface`, maintaining 100% vector fidelity across light and dark modes.
+  - Updated `assets/images/onboarding_name_icon.svg` with the canonical standalone SVG.
+- **Ambient Background Shapes**:
+  - Injected dynamic color transition into `_buildAmbientBackgroundShapes()` for `Sunny - Move` when dynamic mode is active.
+  - Smoothly cross-fades ambient background Sunny as user navigates into Screen 8's cohesive Top Middle Section.
+- **Files Modified**:
+  - `assets/images/onboarding_name_icon.svg`
+  - `lib/features/auth/pages/onboarding_page.dart`
+  - `Version.md`
+- **Status**: 100% (Completed & Verified)
