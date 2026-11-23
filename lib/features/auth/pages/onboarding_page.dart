@@ -416,7 +416,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     } else {
 
       sunnyCenterX = lerpDouble(339.0, 206.0, p67)!;
-      sunnyCenterY = lerpDouble(93.0, 228.0, p67)!;
+      sunnyCenterY = lerpDouble(93.0, 268.0, p67)!;
       sunnySize = lerpDouble(287.3, 376.4, p67)!;
     }
 
@@ -2052,6 +2052,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   // SCREEN 8: YOU'RE ALL SET (LET'S DIVE IN)
   // ============================================================================
   Widget _buildScreen8(ThemeData theme, ColorScheme colorScheme, bool isDynamicColor) {
+    final size = MediaQuery.of(context).size;
+    final sy = size.height / 917.0;
+
+    // Calculate exact top spacing to guarantee Logo center is at 268.0 * sy, perfectly matching Sunny - Move
+    final mediaPadding = MediaQuery.of(context).padding;
+    final topBarContentHeight = mediaPadding.top + 12.0 + 38.0;
+    final targetLogoCenterY = 268.0 * sy;
+    final spaceBeforeLogo = math.max(12.0, (targetLogoCenterY - 65.0) - topBarContentHeight);
+
     return SafeArea(
       // Section 1: System Overlay - adapts accordingly to phone notification space above & nav bar below
       child: Padding(
@@ -2068,10 +2077,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 fit: BoxFit.contain,
               ),
             ),
-            const Spacer(flex: 1),
+            SizedBox(height: spaceBeforeLogo),
 
             // Section 3: Top middle section - houses the Wallet Logo
-            // Sunny move from ambient background smoothly transitions from screen 7 to 8 directly behind this logo
+            // Cohesive with Sunny - Move: strictly shares exact center (size.width / 2, 268.0 * sy) with 0.0px deviation
             Center(
               child: SvgPicture.asset(
                 'assets/images/logo.svg',

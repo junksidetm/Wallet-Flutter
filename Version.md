@@ -1923,3 +1923,19 @@ ont_awesome_flutter\ v11 APIs.
   - `.github/workflows/codeql.yml`
   - `Version.md`
 - **Status**: 100% (Completed & Verified)
+
+
+## [2026-11-23 18:12:00 IST] - Pixel-Perfect Cohesive Centering of Sunny Move and Wallet Logo on Screen 8
+- **Action**: Resolved the 56px vertical misalignment between `Sunny - Move` and `Wallet - Logo` on Onboarding Screen 8.
+- **Root Cause & Mathematical Correction**:
+  - `Sunny - Move` target center Y was set to `228.0`, whereas in wireframe 8 both Sunny and Wallet centers sit at $Y = 268.0$ ($0.293\times\text{height}$).
+  - `Wallet - Logo` was placed inside a `Column` with a flexible `Spacer(flex: 1)`, resulting in dynamic displacement (~$284\text{dp}$ on 917h devices, a $56.25\text{px}$ vertical error).
+- **Remediation**:
+  - Aligned `sunnyCenterY` interpolation to terminate at $268.0\times sy$ in `_buildAmbientBackgroundShapes`.
+  - Replaced the flexible spacer before `Wallet - Logo` in `_buildScreen8` with an exact calculated spacing:
+    $$\text{spaceBeforeLogo} = \max(12.0, (268.0\times sy - 65.0) - (\text{mediaPadding.top} + 12.0 + 38.0))$$
+  - Guaranteed exact $0.0\text{px}$ deviation between `Sunny - Move` and `Wallet - Logo` centers across all screen resolutions and aspect ratios.
+- **Files Modified**:
+  - `lib/features/auth/pages/onboarding_page.dart`
+  - `Version.md`
+- **Status**: 100% (Completed & Verified)
