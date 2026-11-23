@@ -72,11 +72,13 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
+          build-mode: manual
 
       - name: Build Android Code for CodeQL Extraction
         run: |
           set -o pipefail
           flutter build apk --release --no-tree-shake-icons --android-skip-build-dependency-validation 2>&1 | tee build_codeql.log
+          cd android && ./gradlew compileReleaseKotlin compileReleaseJavaWithJavac --no-daemon 2>&1 | tee -a ../build_codeql.log
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4

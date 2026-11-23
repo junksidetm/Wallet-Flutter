@@ -1910,3 +1910,16 @@ ont_awesome_flutter\ v11 APIs.
   - `wallet-universal.apk` (Fat universal binary) & `.sha256`
 - **Verification**: Verified production-signed binaries, attached SHA-256 checksums, and verified GitHub release portal live.
 - **Status**: 100% (Completed & Published Live)
+
+
+## [2026-11-23 18:05:00 IST] - CI CodeQL Fix: Manual Build Mode with --no-daemon Compiler Tracing
+- **Root Cause Analysis**:
+  - GitHub CodeQL Action v4.39.4 introduced strict enforcement failing with exit code 32 (`ERROR: CodeQL detected code written in Java/Kotlin but could not process any of it`).
+  - Standard `flutter build apk` delegates compilation to a background Gradle daemon, preventing CodeQL's `LD_PRELOAD` tracer from intercepting `kotlinc` and `javac` compiler calls.
+- **Remediation**:
+  - Configured `build-mode: manual` in CodeQL Action initialization.
+  - Added foreground `./gradlew compileReleaseKotlin compileReleaseJavaWithJavac --no-daemon` step in `codeql.yml`, ensuring compiler invocations are directly captured by the CodeQL database extractor.
+- **Files Modified**:
+  - `.github/workflows/codeql.yml`
+  - `Version.md`
+- **Status**: 100% (Completed & Verified)
