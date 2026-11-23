@@ -298,7 +298,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildScreen1(theme, colorScheme, heroColor),
+                  _buildScreen1(theme, colorScheme, heroColor, isDynamicColor),
                   _buildScreen2(theme, colorScheme),
                   _buildScreen3(theme, colorScheme),
                   _buildScreen4(theme, colorScheme),
@@ -652,13 +652,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     ThemeData theme,
     ColorScheme colorScheme,
     Color heroColor,
+    bool isDynamicColor,
   ) {
     return SafeArea(
+      // Section 1: System Overlay - adapts dynamically to phone notification space above & nav bar below
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Column(
           children: [
-            // Top Bar
+            // Section 2: Top section - just below system overlay, houses the top bar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -668,7 +670,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             ),
             const SizedBox(height: 12),
 
-            // Hero Illustration (welcome.svg - scaled up ~1.35x for prominent hero presence)
+            // Section 3: Top - Middle section - houses the hero illustration
             Expanded(
               flex: 6,
               child: Center(
@@ -684,59 +686,75 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             ),
             const SizedBox(height: 16),
 
-            // Headline Text: "Welcome to" (Centered exact as WireFrame 1)
-            Center(
-              child: Text(
-                'Welcome to',
-                maxLines: 1,
-                softWrap: false,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                  fontFamily: 'GoogleSansFlex',
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Sub-pill "Wallet" (75% opacity so underlying background shapes can be seen)
-            Center(
-              child: Container(
-                width: 287,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.75),
-                  borderRadius: BorderRadius.circular(40),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorScheme.primary.withValues(alpha: 0.25),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
+            // Section 4: Middle - Bottom section - houses "Welcome to" and cohesive "Wallet" pill
+            Column(
+              children: [
+                // Headline Text: "Welcome to" (Centered exact as WireFrame 1)
+                Center(
+                  child: Text(
+                    'Welcome to',
+                    maxLines: 1,
+                    softWrap: false,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                      fontFamily: 'GoogleSansFlex',
+                      letterSpacing: -0.5,
                     ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'Wallet',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.w900,
-                    color: colorScheme.onPrimary,
-                    fontFamily: 'GoogleSansFlex',
-                    letterSpacing: -1,
                   ),
                 ),
-              ),
+                const SizedBox(height: 12),
+
+                // Pill Container: "Wallet" (Replaces wireframe #D9D9D9 with dynamic theme container at 0.54 opacity)
+                // Flanked cohesively by ambient Bun - Move on the left and Sunny - Move on the right
+                Center(
+                  child: Container(
+                    width: 287,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: (isDynamicColor
+                              ? colorScheme.primaryContainer
+                              : colorScheme.surfaceContainerHighest)
+                          .withOpacity(0.54),
+                      borderRadius: BorderRadius.circular(44),
+                      border: Border.all(
+                        color: colorScheme.primary.withOpacity(0.25),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withOpacity(0.12),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Wallet',
+                      style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.w900,
+                        color: isDynamicColor
+                            ? colorScheme.onPrimaryContainer
+                            : colorScheme.onSurface,
+                        fontFamily: 'GoogleSansFlex',
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const Spacer(flex: 1),
 
-            // Bottom "Welcome" Button (Uses colorScheme.primary & colorScheme.onPrimary so text dynamically matches Next/Skip buttons in dark mode)
+            // Section 5: Bottom section - houses the Welcome action button
+            // Replaces wireframe #D9D9D9 container with dynamic theme color
             SizedBox(
               width: double.infinity,
-              height: 62,
+              height: 64,
               child: FilledButton(
                 onPressed: _nextPage,
                 style: FilledButton.styleFrom(
@@ -747,12 +765,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Welcome',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onPrimary,
                     fontFamily: 'GoogleSansFlex',
                   ),
                 ),
