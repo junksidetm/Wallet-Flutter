@@ -1868,3 +1868,17 @@ ont_awesome_flutter\ v11 APIs.
   - `wallet-universal.apk` (Fat universal binary) & `.sha256`
 - **Verification**: Verified production-signed binaries, attached SHA-256 checksums, and verified GitHub release portal live.
 - **Status**: 100% (Completed & Published Live)
+
+
+## [2026-11-23 17:20:00 IST] - Continuous Sunny Move Motion Choreography Across Screen 7 to 8
+- **Action**: Restored unified ambient background motion choreography for `Sunny - Move` across the Screen 7 $\to$ Screen 8 transition.
+- **Motion & Layout Specifications**:
+  - Eliminated artificial opacity fade-out in `_buildAmbientBackgroundShapes`.
+  - `Sunny - Move` remains the single, perpetual ambient shape across the entire flow:
+    - Screens 2–7: Positioned top-right at `(339.0, 93.0)` with size `287.3dp`, continuously rotating on its axis and cycling dynamic theme colors.
+    - Screen 7 $\to$ 8: Smoothly interpolates position and scale towards `(206.0, 228.0)` and size `376.4dp`, gliding directly into place behind the foreground `Wallet - Logo` in the Top Middle Section.
+  - Removed duplicate `Sunny` instance from `_buildScreen8`, preserving strict cohesion between the ambient shape and foreground brand logo.
+- **Files Modified**:
+  - `lib/features/auth/pages/onboarding_page.dart`
+  - `Version.md`
+- **Status**: 100% (Completed & Verified)

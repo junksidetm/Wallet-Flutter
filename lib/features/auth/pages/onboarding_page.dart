@@ -404,7 +404,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     double sunnyCenterX;
     double sunnyCenterY;
     double sunnySize;
-    double sunnyOpacity = 1.0;
 
     if (_currentPage <= 1.0) {
       sunnyCenterX = lerpDouble(333.0, 339.0, p01)!;
@@ -415,7 +414,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       sunnyCenterY = 93.0;
       sunnySize = 287.3;
     } else {
-      sunnyOpacity = lerpDouble(1.0, 0.0, p67)!.clamp(0.0, 1.0);
 
       sunnyCenterX = lerpDouble(339.0, 206.0, p67)!;
       sunnyCenterY = lerpDouble(93.0, 228.0, p67)!;
@@ -426,7 +424,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       sunnyCenterX = 339.0;
       sunnyCenterY = 93.0;
       sunnySize = 287.3;
-      sunnyOpacity = 1.0;
     }
 
     // 2. BUN - MOVE:
@@ -518,35 +515,31 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
               ),
             ),
 
-          // Sunny shape (top-right or behind wallet)
-          if (sunnyOpacity > 0.01)
-            Positioned(
-              left: sunnyCenterX * sx - (sunnySize * sx) / 2,
-              top: sunnyCenterY * sy - (sunnySize * sy) / 2,
-              width: sunnySize * sx,
-              height: sunnySize * sy,
-              child: Opacity(
-                opacity: sunnyOpacity,
-                child: AnimatedBuilder(
-                  animation: _ambientRotationController,
-                  builder: (context, child) {
-                    final dynamicSunnyColor = _getSunnyColor(
-                      colorScheme,
-                      isDynamicColor,
-                      _ambientRotationController.value,
-                    );
-                    return Transform.rotate(
-                      angle: _ambientRotationController.value * 2 * math.pi,
-                      child: SvgPicture.asset(
-                        'assets/images/shape_sunny.svg',
-                        fit: BoxFit.contain,
-                        colorFilter: ColorFilter.mode(dynamicSunnyColor, BlendMode.srcIn),
-                      ),
-                    );
-                  },
-                ),
-              ),
+          // Sunny shape (moves smoothly across screens 1 -> 7 -> 8)
+          Positioned(
+            left: sunnyCenterX * sx - (sunnySize * sx) / 2,
+            top: sunnyCenterY * sy - (sunnySize * sy) / 2,
+            width: sunnySize * sx,
+            height: sunnySize * sy,
+            child: AnimatedBuilder(
+              animation: _ambientRotationController,
+              builder: (context, child) {
+                final dynamicSunnyColor = _getSunnyColor(
+                  colorScheme,
+                  isDynamicColor,
+                  _ambientRotationController.value,
+                );
+                return Transform.rotate(
+                  angle: _ambientRotationController.value * 2 * math.pi,
+                  child: SvgPicture.asset(
+                    'assets/images/shape_sunny.svg',
+                    fit: BoxFit.contain,
+                    colorFilter: ColorFilter.mode(dynamicSunnyColor, BlendMode.srcIn),
+                  ),
+                );
+              },
             ),
+          ),
 
           // Bun shape (left edge)
           if (bunOpacity > 0.01)
@@ -2060,47 +2053,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             ),
             const Spacer(flex: 1),
 
-            // Section 3: Top middle section - cohesive Sunny - Move and Wallet - Logo
-            // Sunny move rotates on its axis and transitions colors if dynamic mode is enabled
-            // Wallet logo sits centered right in front of Sunny, keeping their positions cohesive
+            // Section 3: Top middle section - houses the Wallet Logo
+            // Sunny move from ambient background smoothly transitions from screen 7 to 8 directly behind this logo
             Center(
-              child: SizedBox(
-                width: 280,
-                height: 280,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Sunny - Move: Rotating on its axis with dynamic color transitions
-                    AnimatedBuilder(
-                      animation: _ambientRotationController,
-                      builder: (context, child) {
-                        final sunnyColor = _getSunnyColor(
-                          colorScheme,
-                          isDynamicColor,
-                          _ambientRotationController.value,
-                        );
-                        return Transform.rotate(
-                          angle: _ambientRotationController.value * 2 * math.pi,
-                          child: SvgPicture.asset(
-                            'assets/images/shape_sunny.svg',
-                            width: 280,
-                            height: 280,
-                            fit: BoxFit.contain,
-                            colorFilter: ColorFilter.mode(sunnyColor, BlendMode.srcIn),
-                          ),
-                        );
-                      },
-                    ),
-
-                    // Wallet - Logo: Centered and cohesive with Sunny - Move
-                    SvgPicture.asset(
-                      'assets/images/logo.svg',
-                      width: 175,
-                      height: 130,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
+              child: SvgPicture.asset(
+                'assets/images/logo.svg',
+                width: 175,
+                height: 130,
+                fit: BoxFit.contain,
               ),
             ),
             const Spacer(flex: 1),
